@@ -4,6 +4,7 @@ import { AdminLayoutComponent } from './layouts/admin/admin-layout.component';
 import { AuthLayoutComponent } from './layouts/auth/auth-layout.component';
 
 import { AuthGuard} from './core/auth.guard';
+import {AdminGuard} from './core/admin.guard';
 
 export const AppRoutes: Routes = [{
         path: '',
@@ -15,23 +16,23 @@ export const AppRoutes: Routes = [{
         children: [{
             path: 'dashboard',
             loadChildren: './dashboard/dashboard.module#DashboardModule',
-            canActivate: [AuthGuard]
+            canActivate: [AuthGuard, AdminGuard]
         },{
             path: 'components',
             loadChildren: './components/components.module#ComponentsModule',
-            canActivate: [AuthGuard]
+            canActivate: [AuthGuard, AdminGuard]
         },{
             path: 'forms',
             loadChildren: './forms/forms.module#Forms',
-            canActivate: [AuthGuard]
+            canActivate: [AuthGuard, AdminGuard]
         },{
             path: 'entry',
             loadChildren: './entry/entry.module#EntryModule',
-            canActivate: [AuthGuard]
+            canActivate: [AuthGuard, AdminGuard]
         },{
             path: 'charts',
             loadChildren: './charts/charts.module#ChartsModule',
-            canActivate: [AuthGuard]
+            canActivate: [AuthGuard, AdminGuard]
         },{
             path: '',
             loadChildren: './userpage/user.module#UserModule',

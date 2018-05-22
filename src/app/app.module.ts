@@ -26,6 +26,7 @@ import { AuthService} from './core/auth.service';
 import {DataService} from './core/data.service';
 import {MaterialModule} from './material.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {AdminGuard} from './core/admin.guard';
 
 @NgModule({
     imports: [
@@ -52,7 +53,8 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
     providers: [
         AuthGuard,
         AuthService,
-        DataService
+        DataService,
+        AdminGuard
     ],
     bootstrap:    [ AppComponent ]
 })

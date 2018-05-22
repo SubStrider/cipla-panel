@@ -8,6 +8,7 @@ import { TablesRoutes } from './entry.routing';
 import { JudgesComponent } from './judges/judges.component';
 import { ViewentriesComponent } from './viewentries/viewentries.component';
 import {MaterialModule} from '../material.module';
+import { DetailComponent } from './detail/detail.component';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import {MaterialModule} from '../material.module';
     declarations: [
         JudgesComponent,
         ViewentriesComponent,
+        DetailComponent,
     ]
 })
 
