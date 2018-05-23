@@ -22,9 +22,6 @@ export class DetailComponent implements OnInit, OnDestroy {
       this.userSubmission = this.afs.collection('submissions')
           .doc(this.submissionId)
           .valueChanges();
-
-      this.userSubmission.subscribe(data => console.log(data) );
-
   }
 
   ngOnDestroy() {
