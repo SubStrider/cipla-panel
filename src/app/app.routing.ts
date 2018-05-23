@@ -28,7 +28,7 @@ export const AppRoutes: Routes = [{
         },{
             path: 'entry',
             loadChildren: './entry/entry.module#EntryModule',
-            canActivate: [AuthGuard, AdminGuard]
+            // canActivate: [AuthGuard, AdminGuard]
         },{
             path: 'charts',
             loadChildren: './charts/charts.module#ChartsModule',

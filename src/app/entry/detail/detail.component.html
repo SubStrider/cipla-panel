@@ -1,3 +1,150 @@
-<p>
-  detail works!
-</p>
+<div class="main-content">
+  <div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card" *ngIf="userSubmission | async as submission">
+                <div class="card-header">
+                    <h4 class="card-title">{{ submission.teamName }}</h4>
+                    <p class="category">Team Name</p>
+                </div>
+                <div class="card-content">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="text-primary">
+                                <h6>Idea Category</h6>
+                            </div>
+                            <div>
+                                <p>{{ submission.category | titlecase }}</p>
+                            </div>
+                            <div class="text-primary">
+                                <h6>Idea Stage</h6>
+                            </div>
+                            <div>
+                                <p>{{ submission.stage | titlecase }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="text-primary">
+                                <h6>Elevator Pitch (within 100 words)</h6>
+                            </div>
+                            <div>
+                                <p>
+                                    {{ submission.pitch }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="text-primary">
+                                <h6>Brief Overview (within 500 words)</h6>
+                            </div>
+                            <div>
+                                <p>
+                                    {{ submission.overview }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="text-primary">
+                                <h6>Supporting documents</h6>
+                            </div>
+                            <div>
+                                <p>
+                                    <a class="btn btn-warning btn-fill btn-wd" href="{{ submission.attachment }}">
+                                        <span data-notify="icon" class="ti-download"></span>
+                                        {{ submission.fileName }}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="text-primary">
+                                <h6>Why do you feel your idea has the potential to disrupt the healthcare world?</h6>
+                            </div>
+                            <div>
+                                <p>
+                                    {{ submission.potential }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="text-primary">
+                                <h6>Who are your target customers/market? </h6>
+                            </div>
+                            <div>
+                                <p>
+                                    {{ submission.market }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!--<div class="col-md-12">-->
+                            <!--<div class="text-primary">-->
+                                <!--<h6>Do you have any existing competitor in the market?</h6>-->
+                            <!--</div>-->
+                            <!--<div>-->
+                                <!--<div class="radio">-->
+                                    <!--<input type="radio" name="radio3" id="radio3" value="option1" disabled="">-->
+                                    <!--<label for="radio3">-->
+                                        <!--Disabled radio is off-->
+                                    <!--</label>-->
+                                <!--</div>-->
+
+                                <!--<div class="radio">-->
+                                    <!--<input type="radio" name="radio4" id="radio4" value="option1" checked="" disabled="">-->
+                                    <!--<label for="radio4">-->
+                                        <!--Disabled radio is on-->
+                                    <!--</label>-->
+                                <!--</div>-->
+                            <!--</div>-->
+                        <!--</div>-->
+
+                        <div class="col-md-12">
+                            <div class="text-primary">
+                                <h6>What is the name of your competitor and how are you different from them?</h6>
+                            </div>
+                            <div>
+                                <p *ngFor="let competition of submission.competition">
+                                    {{ competition }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="text-primary">
+                                <h6>Give a brief overview of your team members</h6>
+                            </div>
+                            <div class="row" *ngFor="let member of submission.members">
+                                <div class="col-md-3">
+                                    <p>{{ member.name }}</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <p>{{ member.role }}</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <p>{{ member.experience }}</p>
+                                </div>
+                                <div class="col-md-3">
+                                    <p><a href="https://{{ member.linkedInProfile }}">LinkedIn</a></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="text-primary">
+                                <h6>How do you want Cipla to partner in your idea?</h6>
+                            </div>
+                            <div>
+                                <p>
+                                    {{ submission.partner }}
+                                </p>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>

@@ -17,7 +17,6 @@ export class AuthService {
     returnUrl;
 
     user$: Observable<User>;
-
     constructor(
         private router: Router,
         private afAuth: AngularFireAuth,
@@ -83,4 +82,5 @@ export class AuthService {
     isAuth() {
         return this.isAuthenticated;
     }
+
 }

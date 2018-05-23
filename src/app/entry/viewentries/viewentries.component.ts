@@ -6,6 +6,7 @@ import { map } from 'rxjs/operators';
 import {EntryTableData} from '../../core/user.model';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { Subscription} from 'rxjs/Subscription';
+import { AngularFirestoreDocument} from 'angularfire2/firestore';
 
 declare var $:any;
 
@@ -24,6 +25,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     // dataRows: Observable<EntryTableData[]>;
     displayedColumns = ['teamName', 'category', 'stage', 'r1Score', 'r2Score', 'actions'];
     dataSource = new MatTableDataSource<EntryTableData>();
+    dataDetail: EntryTableData[];
     private entriesSubscription: Subscription;
 
     @ViewChild(MatSort) sort: MatSort;
@@ -66,10 +68,10 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
     ngAfterViewInit(){
-
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
 
+        console.log(this.dataSource);
 
         $('#datatables').DataTable({
             "pagingType": "full_numbers",

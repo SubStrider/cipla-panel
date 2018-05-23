@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import {EntryTableData} from './user.model';
+import {BasicSubmission, EntryTableData} from './user.model';
 import { AngularFirestore } from 'angularfire2/firestore';
 import {Subject} from 'rxjs/Subject';
 import { StatsCount } from './user.model';
+import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 export class DataService {
@@ -42,7 +43,6 @@ export class DataService {
     //             }
     //         });
     // }
-
 
 }
 

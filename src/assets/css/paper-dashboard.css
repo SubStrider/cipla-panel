@@ -5500,9 +5500,9 @@ strong {
   max-height: 42px;
 }
 .sidebar .logo-img img {
-  width: 42px;
-  top: 16px;
-  left: 18px;
+  width: 200px;
+  top: 0px;
+  left: 0px;
   position: absolute;
 }
 .sidebar .sidebar-background {
@@ -5517,7 +5517,7 @@ strong {
   background-position: center center;
 }
 .sidebar .logo {
-  padding: 18px 0px;
+  padding: 12px 26px;
   margin: 0;
   box-shadow: inset -1px 0px 0px 0px #cfcfca;
   height: 75px;
