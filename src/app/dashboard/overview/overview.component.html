@@ -2,6 +2,41 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-3 col-sm-6">
+                <div class="card" *ngIf="count && count.total">
+                    <div class="card-content">
+                        <div class="row">
+                            <div class="col-xs-5">
+                                <div class="icon-big icon-warning text-center">
+                                    <i class="ti-bar-chart"></i>
+                                </div>
+                            </div>
+                            <div class="col-xs-7">
+                                <div class="numbers">
+                                    <p>Registrations</p>
+                                    {{count.total}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col-xs-5">
+                                    <div class="icon-big icon-warning text-center">
+                                        <i class="ti-info"></i>
+                                    </div>
+                                </div>
+                                <div class="col-xs-7">
+                                    <div class="numbers">
+                                        <p>Cipla</p>
+                                        {{count.cipla}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="card">
                 <div class="card-content">
                     <div class="row">
