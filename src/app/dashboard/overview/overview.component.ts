@@ -213,9 +213,9 @@ export class OverviewComponent implements OnInit, AfterViewInit {
                     this.afs.collection('users')
                         .doc(value.userID).valueChanges()
                         .subscribe(res => {
-                            if (res.email.indexOf('cipla.com') > 0) {
-                                this.totCiplaR1++;
-                            }
+                            // if (res.email.indexOf('cipla.com') > 0) {
+                            //     this.totCiplaR1++;
+                            // }
                         });
                 });
 
