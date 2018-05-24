@@ -5,7 +5,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 
 import { User } from './user.model';
 import { AuthData } from './user.model';
-import {AngularFirestore} from 'angularfire2/firestore';
+import {AngularFirestore, AngularFirestoreDocument} from 'angularfire2/firestore';
 import {Observable} from 'rxjs/Observable';
 // import { TrainingService } from '../training/training.service';
 
@@ -82,5 +82,10 @@ export class AuthService {
     isAuth() {
         return this.isAuthenticated;
     }
+
+    updateUserData(user) {
+        const userRef: AngularFirestoreDocument<User> = this.afs.doc(`users/${user.uid}`);
+        return userRef.set(user, { merge: true });
+      }
 
 }

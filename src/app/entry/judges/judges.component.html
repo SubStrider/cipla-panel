@@ -104,12 +104,15 @@
 
                             <ng-container matColumnDef="email">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.email | titlecase }}</mat-cell>
+                                <mat-cell *matCellDef="let element">{{ element.email }}</mat-cell>
                             </ng-container>
 
                             <ng-container matColumnDef="roles">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Roles</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.roles | json }}</mat-cell>
+                                <mat-cell *matCellDef="let element">
+                                    <mat-checkbox [(ngModel)]="element.roles.judge">Judge</mat-checkbox>
+                                    <mat-checkbox [(ngModel)]="element.roles.admin">Admin</mat-checkbox>
+                                </mat-cell>
                             </ng-container>
 
                             <ng-container matColumnDef="actions">
@@ -118,7 +121,7 @@
                                     <a class="btn btn-icon btn-google">
                                         <span data-notify="icon" class="ti-stats-up"></span>
                                     </a>
-                                    <a class="btn btn-icon btn-fill btn-tumblr">
+                                    <a class="btn btn-icon btn-fill btn-tumblr" (click)="updateUser(element)">
                                         <span data-notify="icon" class="ti-angle-right"></span>
                                     </a>
                                 </mat-cell>

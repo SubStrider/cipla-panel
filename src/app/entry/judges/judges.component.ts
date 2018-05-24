@@ -3,6 +3,7 @@ import { UserTableData } from '../../core/user.model';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { Subscription } from 'rxjs/Subscription';
 import { DataService } from '../../core/data.service';
+import { AuthService } from '../../core/auth.service';
 
 declare var $:any;
 
@@ -23,12 +24,12 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     constructor(
-        private dataService: DataService
+        private dataService: DataService,
+        private authService: AuthService
     ){ }
 
     ngOnInit(){
         this.usersSubscription = this.dataService.usersChanged.subscribe((entries: UserTableData[]) => {
-            console.log(entries);
             this.dataSource.data = entries;
         });
         this.dataService.getUsers()
@@ -46,5 +47,14 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
         console.log(this.dataSource);
+    }
+
+    updateUser(user){
+        console.log(user)
+        this.authService.updateUserData(user).then(r => {
+            console.log('profile updated')
+        }).catch(error => {
+            console.error('Some error occurred', error)
+        })
     }
 }

@@ -4,6 +4,7 @@ import { AngularFirestore } from 'angularfire2/firestore';
 import {Subject} from 'rxjs/Subject';
 import { StatsCount } from './user.model';
 import {Observable} from 'rxjs/Observable';
+import { User } from '@firebase/auth-types';
 
 @Injectable()
 export class DataService {
@@ -50,13 +51,12 @@ export class DataService {
             .snapshotChanges()
             .map(userArray => {
                 return userArray.map(user => {
-                    console.log(user)
                     let u = user.payload.doc.data()
                     return {
                         name: u.name,
                         roles: u.roles,
                         email: u.email,
-                        id: user.payload.doc.id
+                        uid: user.payload.doc.id
                     }
                 })
             })
