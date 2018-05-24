@@ -31,6 +31,7 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
             console.log(entries);
             this.dataSource.data = entries;
         });
+        this.dataService.getUsers()
     }
 
     doFilter(filterValue: string) {
