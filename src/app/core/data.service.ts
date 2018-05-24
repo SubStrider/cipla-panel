@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {BasicSubmission, EntryTableData} from './user.model';
+import {BasicSubmission, EntryTableData, UserTableData} from './user.model';
 import { AngularFirestore } from 'angularfire2/firestore';
 import {Subject} from 'rxjs/Subject';
 import { StatsCount } from './user.model';
@@ -9,7 +9,7 @@ import {Observable} from 'rxjs/Observable';
 export class DataService {
     entriesChanged = new Subject<EntryTableData[]>();
     statsCount: StatsCount;
-
+    usersChanged = new Subject<UserTableData[]>();
 
     constructor(private afs: AngularFirestore ) { }
 
@@ -43,6 +43,27 @@ export class DataService {
     //             }
     //         });
     // }
+
+    
+    getUsers(){
+        this.afs.collection('users')
+            .snapshotChanges()
+            .map(userArray => {
+                return userArray.map(user => {
+                    console.log(user)
+                    let u = user.payload.doc.data()
+                    return {
+                        name: u.name,
+                        roles: u.roles,
+                        email: u.email,
+                        id: user.payload.doc.id
+                    }
+                })
+            })
+            .subscribe((fetchedEntries: UserTableData[]) => {
+                this.usersChanged.next(fetchedEntries)
+            })
+    }
 
 }
 

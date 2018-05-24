@@ -85,3 +85,10 @@ export interface StatsCount {
     stgCountRevenues: number;
     stgCountUndef: number;
 }
+
+export interface UserTableData{
+    name: string;
+    roles: any;
+    email: string;
+    id: string;
+}
