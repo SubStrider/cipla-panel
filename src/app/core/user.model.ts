@@ -91,4 +91,5 @@ export interface UserTableData{
     roles: any;
     email: string;
     uid: string;
+    phone: string;
 }

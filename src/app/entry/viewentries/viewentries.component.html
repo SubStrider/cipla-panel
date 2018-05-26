@@ -13,7 +13,7 @@
                         <mat-table [dataSource]="dataSource" matSort >
                             <ng-container matColumnDef="teamName">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Team Name</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.teamName }}</mat-cell>
+                                <mat-cell *matCellDef="let element">{{ element.teamName }}<br><small class="text-muted">{{element.email}}</small></mat-cell>
                             </ng-container>
 
                             <ng-container matColumnDef="category">

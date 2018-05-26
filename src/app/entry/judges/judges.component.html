@@ -1,95 +1,10 @@
-<!-- <div class="main-content">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Round 1 Judges</h4>
-                        <p class="category">Here is a subtitle for this table</p>
-                    </div>
-                    <div class="card-content table-responsive table-full-width">
-                        <table class="table">
-                                <thead>
-                                    <tr>
-                                      <th class="text-center">{{ tableData1.headerRow[0] }}</th>
-                                      <th>{{ tableData1.headerRow[1] }}</th>
-                                      <th>{{ tableData1.headerRow[2] }}</th>
-                                      <th class="text-right">{{ tableData1.headerRow[4] }}</th>
-                                      <th class="text-right">{{ tableData1.headerRow[5] }}</th>
-                                    </tr>
-                                </thead>
-                              <tbody>
-                                  <tr *ngFor="let row of tableData1.dataRows">
-                                      <td class="text-center">{{row[0]}}</td>
-                                      <td>{{row[1]}}</td>
-                                      <td>{{row[2]}}</td>
-                                      <td class="text-right">&euro; {{row[4]}}</td>
-                                      <td class="td-actions text-right">
-                                          <a rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
-                                              <i class="ti-user"></i>
-                                          </a>
-                                          <a rel="tooltip" title="Edit Profile" class="btn btn-success btn-simple btn-xs">
-                                              <i class="ti-pencil-alt"></i>
-                                          </a>
-                                          <a rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                              <i class="ti-close"></i>
-                                          </a>
-                                      </td>
-                                  </tr>
-                              </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">Round 2 Judges</h4>
-                        <p class="category">Here is a subtitle for this table</p>
-                    </div>
-                    <div class="card-content table-responsive table-full-width">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th class="text-center">{{ tableData1.headerRow[0] }}</th>
-                                <th>{{ tableData1.headerRow[1] }}</th>
-                                <th>{{ tableData1.headerRow[2] }}</th>
-                                <th class="text-right">{{ tableData1.headerRow[4] }}</th>
-                                <th class="text-right">{{ tableData1.headerRow[5] }}</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr *ngFor="let row of tableData1.dataRows">
-                                <td class="text-center">{{row[0]}}</td>
-                                <td>{{row[1]}}</td>
-                                <td>{{row[2]}}</td>
-                                <td class="text-right">&euro; {{row[4]}}</td>
-                                <td class="td-actions text-right">
-                                    <a rel="tooltip" title="View Profile" class="btn btn-info btn-simple btn-xs">
-                                        <i class="ti-user"></i>
-                                    </a>
-                                    <a rel="tooltip" title="Edit Profile" class="btn btn-success btn-simple btn-xs">
-                                        <i class="ti-pencil-alt"></i>
-                                    </a>
-                                    <a rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                        <i class="ti-close"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div> -->
 <div class="main-content">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-content">
+                        <button class="btn btn-default pull-right" (click)="downloadUserCsv()">Download CSV</button>
                         <div fxLayoutAlign="center center">
                             <mat-form-field fxFlex="40%">
                                 <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Filter">
@@ -106,6 +21,11 @@
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Email</mat-header-cell>
                                 <mat-cell *matCellDef="let element">{{ element.email }}</mat-cell>
                             </ng-container>
+
+                            <ng-container matColumnDef="phone">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header>Phone</mat-header-cell>
+                                    <mat-cell *matCellDef="let element">{{ element.phone }}</mat-cell>
+                                </ng-container>
 
                             <ng-container matColumnDef="roles">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Roles</mat-header-cell>

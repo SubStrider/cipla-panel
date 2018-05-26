@@ -39,28 +39,18 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     public dataTable: DataTable;
 
     ngOnInit(){
-        // this.dataTable = {
-        //     headerRow: [ 'Team Name', 'Category', 'Stage', 'R1 Score', 'R2 Score', 'Actions' ],
-        //     footerRow: [ 'Team Name', 'Category', 'Stage', 'R1 Score', 'R2 Score', 'Actions' ],
-        //  };
-
-        // this.dataRows = this.afs.collection('submissions')
-        //     .snapshotChanges()
-        //     .map(docArray => {
-        //         return docArray.map(doc => {
-        //             return {
-        //                 teamName: doc.payload.doc.data().teamName,
-        //                 category: doc.payload.doc.data().category,
-        //                 stage: doc.payload.doc.data().stage,
-        //                 r1Score: doc.payload.doc.data().r1Score,
-        //                 r2Score: doc.payload.doc.data().r2Score,
-        //                 submissionId: doc.payload.doc.id
-        //             };
-        //         });
-        //     });
-
         this.entriesSubscription = this.dataService.entriesChanged.subscribe((entries: EntryTableData[]) => {
+            
+            entries.forEach((entry, index) => {
+                this.afs.collection('users')
+                        .doc(entry['userId']).valueChanges()
+                        .subscribe(res => {
+                            entry['email'] = res['email']
+                        });
+            });
+            
             this.dataSource.data = entries;
+            // console.log(entries);
         });
         this.dataService.fetchEntries();
     }
@@ -70,39 +60,6 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     ngAfterViewInit(){
         this.dataSource.sort = this.sort;
         this.dataSource.paginator = this.paginator;
-
-        console.log(this.dataSource);
-
-        $('#datatables').DataTable({
-            "pagingType": "full_numbers",
-            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            responsive: true,
-            language: {
-            search: "_INPUT_",
-                searchPlaceholder: "Search records",
-            },
-        });
-
-        var table = $('#datatables').DataTable();
-         // Edit record
-        table.on( 'click', '.edit', function () {
-            var $tr = $(this).closest('tr');
-
-            var data = table.row($tr).data();
-            alert( 'You press on Row: ' + data[0] + ' ' + data[1] + ' ' + data[2] + '\'s row.' );
-        });
-
-        // Delete a record
-        table.on( 'click', '.remove', function (e) {
-            var $tr = $(this).closest('tr');
-            table.row($tr).remove().draw();
-            e.preventDefault();
-        });
-
-        //Like record
-        table.on( 'click', '.like', function () {
-            alert('You clicked on Like button');
-        });
     }
 
     doFilter(filterValue: string) {

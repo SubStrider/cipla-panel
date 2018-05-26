@@ -25,7 +25,8 @@ export class DataService {
                         stage: doc.payload.doc.data().stage,
                         r1Score: doc.payload.doc.data().r1Score,
                         r2Score: doc.payload.doc.data().r2Score,
-                        submissionId: doc.payload.doc.id
+                        submissionId: doc.payload.doc.id,
+                        userId: doc.payload.doc.data().userId
                     };
                 });
             })
@@ -56,7 +57,8 @@ export class DataService {
                         name: u.name,
                         roles: u.roles,
                         email: u.email,
-                        uid: user.payload.doc.id
+                        uid: user.payload.doc.id,
+                        phone: u.phone
                     }
                 })
             })

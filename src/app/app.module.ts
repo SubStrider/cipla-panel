@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { APP_BASE_HREF } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PapaParseModule } from 'ngx-papaparse';
 
 import { AppComponent }   from './app.component';
 
@@ -43,7 +44,8 @@ import {AdminGuard} from './core/admin.guard';
         AngularFireModule.initializeApp(environment.firebase),
         AngularFirestoreModule,
         AngularFireAuthModule,
-        MaterialModule
+        MaterialModule,
+        PapaParseModule
     ],
     declarations: [
         AppComponent,

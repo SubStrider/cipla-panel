@@ -4,6 +4,8 @@ import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { Subscription } from 'rxjs/Subscription';
 import { DataService } from '../../core/data.service';
 import { AuthService } from '../../core/auth.service';
+import { PapaParseService } from 'ngx-papaparse';
+import * as moment from 'moment';
 
 declare var $:any;
 
@@ -15,7 +17,7 @@ declare var $:any;
 
 export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
 
-    displayedColumns = ['name', 'roles', 'email', 'actions'];
+    displayedColumns = ['name', 'roles', 'email', 'phone','actions'];
     dataSource = new MatTableDataSource<UserTableData>();
     dataDetail: UserTableData[];
     usersSubscription: Subscription;
@@ -25,7 +27,8 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
 
     constructor(
         private dataService: DataService,
-        private authService: AuthService
+        private authService: AuthService,
+        private papa: PapaParseService
     ){ }
 
     ngOnInit(){
@@ -57,4 +60,22 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
             console.error('Some error occurred', error)
         })
     }
+
+    downloadUserCsv(){
+       let csvData = this.papa.unparse(this.dataSource.data,{header: true})
+       this.download(`Users - ${moment().format('MMM dd hhmmss')}`, csvData)
+    }
+
+    download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+      
+        element.style.display = 'none';
+        document.body.appendChild(element);
+      
+        element.click();
+      
+        document.body.removeChild(element);
+      }
 }
