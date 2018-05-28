@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, OnDestroy, AfterViewChecked } from '@angular/core';
 import * as Chartist from 'chartist';
 import { EntryTableData } from '../../core/user.model';
 import { DataService } from '../../core/data.service';
@@ -16,7 +16,7 @@ declare var $: any;
     templateUrl: './overview.component.html'
 })
 
-export class OverviewComponent implements OnInit, AfterViewInit {
+export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     totCount = 0;
     count: any = { total: 0, cipla: 0 };
     totCiplaR1 = 0;
@@ -165,8 +165,6 @@ export class OverviewComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit() {
         this.initCirclePercentage();
-        this.userSubscription.unsubscribe();
-        this.statsSubscription.unsubscribe();
     }
 
     checkArrayAndUpdate(arr: any[], name: string) {
@@ -215,7 +213,6 @@ export class OverviewComponent implements OnInit, AfterViewInit {
                 });
             })
             .subscribe(result => {
-
                 let weekCount = []
 
                 result.forEach(value => {
@@ -227,6 +224,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
 
                     weekCount.push({
                         week: value.createdAt ? moment(value.createdAt).format('W') : '21',
+                        weekNumber: value.createdAt ? `Week ${3 + parseInt(moment(value.createdAt).format('W')) - 20}` : 'Week 1 - 3',
                         date: value.createdAt || moment('2018-05-24').toDate()
                     })
 
@@ -239,7 +237,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
                         });
                 });
 
-                console.log(_.countBy(weekCount, 'week'))
+                let weekData = _.chain(weekCount).sortBy('weekNumber').groupBy('weekNumber').value()
 
                 this.chartStage.update({
                     labels: _.map(this.stageCount, 'name'),
@@ -250,7 +248,17 @@ export class OverviewComponent implements OnInit, AfterViewInit {
                     labels: _.map(this.catCount, 'name'),
                     series: [_.map(this.catCount, 'count')]
                 });
+
+                this.chartWeek.update({
+                    labels:_.keys(weekData),
+                    series: [_.map(_.values(weekData), 'length')]
+                });
             });
+    }
+
+    ngOnDestroy(){
+        this.userSubscription.unsubscribe();
+        this.statsSubscription.unsubscribe();
     }
 
 }
