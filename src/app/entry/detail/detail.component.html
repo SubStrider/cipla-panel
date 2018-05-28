@@ -4,11 +4,11 @@
             <div class="col-md-12">
                 <div class="card" *ngIf="userSubmission | async as submission">
                     <div class="card-header">
+                        <h6 class="text-primary">Team Name</h6>
                         <h4 class="card-title">
                         <button class="btn btn-default pull-right" (click)="downloadPDF()">Download PDF</button>
-                        {{ submission.teamName }} 
+                        {{ submission.teamName || 'No Team Name'}} 
                         </h4>
-                        <p class="category">Team Name</p>
                     </div>
                     <div class="card-content">
                         <div class="row">
@@ -23,7 +23,7 @@
                                     <h6>Idea Stage</h6>
                                 </div>
                                 <div>
-                                    <p>{{ submission.stage | titlecase }}</p>
+                                    <p>{{ submission.stage || 'Ideation' | titlecase }}</p>
                                 </div>
                             </div>
                             <div class="col-md-8">
@@ -47,7 +47,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-md-12">
+                            <div class="col-md-12" *ngIf="submission.attachment">
                                 <div class="text-primary">
                                     <h6>Supporting documents</h6>
                                 </div>

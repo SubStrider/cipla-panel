@@ -40,9 +40,7 @@
             "../node_modules/bootstrap-tagsinput/dist/bootstrap-tagsinput.js",
             "../node_modules/jasny-bootstrap/dist/js/jasny-bootstrap.min.js",
             "../src/assets/js/sweetalert2.js",
-            "../src/assets/js/jquery.validate.min.js",
-            "../node_modules/jspdf/dist/jspdf.min.js",
-            "../node_modules/html2canvas/dist/html2canvas.min.js"
+            "../src/assets/js/jquery.validate.min.js"
 
         ],
         "environmentSource": "environments/environment.ts",

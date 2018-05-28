@@ -7,6 +7,7 @@ import { StatsData } from '../../core/user.model';
 import { AngularFirestore } from 'angularfire2/firestore';
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import { ISubscription } from 'rxjs/Subscription';
 
 declare var $: any;
 
@@ -21,6 +22,8 @@ export class OverviewComponent implements OnInit, AfterViewInit {
     totCiplaR1 = 0;
     totCountR2 = 0;
     totCiplaR2 = 0;
+    userSubscription: ISubscription;
+    statsSubsctiption: ISubscription;
 
     catCount: any[] = [
         { name: 'pharmaceutical', count: 0 },
@@ -162,6 +165,8 @@ export class OverviewComponent implements OnInit, AfterViewInit {
 
     ngAfterViewInit() {
         this.initCirclePercentage();
+        this.userSubscription.unsubscribe();
+        this.statsSubsctiption.unsubscribe();
     }
 
     checkArrayAndUpdate(arr: any[], name: string) {
@@ -178,7 +183,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
     }
 
     fetchUserCount() {
-        this.afs.collection('users')
+        this.userSubscription = this.afs.collection('users')
             .snapshotChanges()
             .map(userArray => {
                 return userArray.map(user => {
@@ -194,7 +199,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
     }
 
     fetchStatsCount() {
-        this.afs.collection('submissions')
+        this.statsSubscription = this.afs.collection('submissions')
             .snapshotChanges()
             .map(docArray => {
                 return docArray.map(doc => {

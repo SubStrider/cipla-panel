@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/mergeMap';
 import { ActivatedRoute } from '@angular/router';
 import * as jsPDF from 'jspdf'
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-detail',
@@ -31,8 +32,10 @@ export class DetailComponent implements OnInit, OnDestroy {
 
   downloadPDF() {
     let pdf = new jsPDF('p', 'pt', 'a4');
-    pdf.addHTML(document.body, function () {
-      pdf.save('web.pdf');
+    pdf.addHTML($('.container-fluid')[0], 15, 15, {
+      'background': '#fff',
+    }, function () {
+      pdf.save('sample-file.pdf');
     });
   }
 
