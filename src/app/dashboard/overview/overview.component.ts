@@ -166,7 +166,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
     ngAfterViewInit() {
         this.initCirclePercentage();
         this.userSubscription.unsubscribe();
-        this.statsSubsctiption.unsubscribe();
+        this.statsSubscription.unsubscribe();
     }
 
     checkArrayAndUpdate(arr: any[], name: string) {
