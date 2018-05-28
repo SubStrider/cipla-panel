@@ -23,7 +23,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
     totCountR2 = 0;
     totCiplaR2 = 0;
     userSubscription: ISubscription;
-    statsSubsctiption: ISubscription;
+    statsSubscription: ISubscription;
 
     catCount: any[] = [
         { name: 'pharmaceutical', count: 0 },
