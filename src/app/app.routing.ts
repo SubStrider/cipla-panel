@@ -5,6 +5,7 @@ import { AuthLayoutComponent } from './layouts/auth/auth-layout.component';
 
 import { AuthGuard} from './core/auth.guard';
 import {AdminGuard} from './core/admin.guard';
+import { JudgeGuard } from './core/judge.guard';
 
 export const AppRoutes: Routes = [{
         path: '',
@@ -16,7 +17,7 @@ export const AppRoutes: Routes = [{
         children: [{
             path: 'dashboard',
             loadChildren: './dashboard/dashboard.module#DashboardModule',
-            canActivate: [AuthGuard, AdminGuard]
+            canActivate: [AuthGuard, JudgeGuard, AdminGuard]
         },{
             path: 'components',
             loadChildren: './components/components.module#ComponentsModule',

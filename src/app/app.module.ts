@@ -28,6 +28,7 @@ import {DataService} from './core/data.service';
 import {MaterialModule} from './material.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AdminGuard} from './core/admin.guard';
+import { JudgeGuard } from './core/judge.guard';
 
 @NgModule({
     imports: [
@@ -56,7 +57,8 @@ import {AdminGuard} from './core/admin.guard';
         AuthGuard,
         AuthService,
         DataService,
-        AdminGuard
+        AdminGuard,
+        JudgeGuard
     ],
     bootstrap:    [ AppComponent ]
 })

@@ -20,7 +20,6 @@ export class AuthService {
     constructor(
         private router: Router,
         private afAuth: AngularFireAuth,
-        private route: ActivatedRoute,
         private afs: AngularFirestore,
     ) {
         //// Get auth data, then get firestore user document || null
@@ -60,19 +59,10 @@ export class AuthService {
     }
 
     login(authData: AuthData) {
-        this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
-        console.log(this.returnUrl);
-        localStorage.setItem('returnUrl', this.returnUrl);
+        
 
-        this.afAuth.auth
+        return this.afAuth.auth
             .signInWithEmailAndPassword(authData.email, authData.password)
-            .then(result => {
-                console.log(result);
-                this.router.navigateByUrl(this.returnUrl);
-            })
-            .catch(error => {
-                console.log(error);
-            });
     }
 
     logout() {

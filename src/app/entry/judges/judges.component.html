@@ -14,7 +14,7 @@
                         <mat-table [dataSource]="dataSource" matSort >
                             <ng-container matColumnDef="name">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.name | titlecase }}</mat-cell>
+                                <mat-cell *matCellDef="let element">{{ element.name | titlecase }}<br><small>{{element.uid}}</small></mat-cell>
                             </ng-container>
 
                             <ng-container matColumnDef="email">
@@ -28,8 +28,8 @@
                                 </ng-container>
 
                             <ng-container matColumnDef="roles">
-                                <mat-header-cell *matHeaderCellDef mat-sort-header>Roles</mat-header-cell>
-                                <mat-cell *matCellDef="let element">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header [hidden]="!(user && user.roles.admin)">Roles</mat-header-cell>
+                                <mat-cell *matCellDef="let element" [hidden]="!(user && user.roles.admin)">
                                     <mat-checkbox [(ngModel)]="element.roles.judge">Judge</mat-checkbox>
                                     <mat-checkbox [(ngModel)]="element.roles.admin">Admin</mat-checkbox>
                                 </mat-cell>

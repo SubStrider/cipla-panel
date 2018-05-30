@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef } from '@angular/core';
 import { Location, LocationStrategy, PathLocationStrategy } from '@angular/common';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService} from '../../core/auth.service';
+import { Router, ActivatedRoute } from '@angular/router';
 
 declare var $:any;
 
@@ -18,8 +19,12 @@ export class LoginComponent implements OnInit{
     private toggleButton;
     private sidebarVisible: boolean;
     private nativeElement: Node;
+    returnUrl: string;
+    error: any;
 
-    constructor(private element : ElementRef, private authService: AuthService) {
+    constructor(private element : ElementRef, private authService: AuthService, private router: Router, 
+        private route: ActivatedRoute,
+    ) {
         this.nativeElement = element.nativeElement;
         this.sidebarVisible = false;
     }
@@ -70,9 +75,20 @@ export class LoginComponent implements OnInit{
     }
 
     onSubmit() {
+        this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
+        console.log(this.returnUrl);
+        localStorage.setItem('returnUrl', this.returnUrl);
         this.authService.login({
             email: this.loginForm.value.email,
             password: this.loginForm.value.password
+        })
+        .then(result => {
+            console.log(result);
+            this.router.navigateByUrl(this.returnUrl);
+        })
+        .catch(error => {
+            console.log(error);
+            this.error = error;
         });
     }
 }

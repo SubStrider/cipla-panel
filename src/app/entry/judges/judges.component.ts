@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 import { UserTableData } from '../../core/user.model';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription, ISubscription } from 'rxjs/Subscription';
 import { DataService } from '../../core/data.service';
 import { AuthService } from '../../core/auth.service';
 import { PapaParseService } from 'ngx-papaparse';
@@ -17,17 +17,19 @@ declare var $:any;
 
 export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
 
-    displayedColumns = ['name', 'roles', 'email', 'phone','actions'];
+    displayedColumns = ['name', 'email', 'phone','actions'];
     dataSource = new MatTableDataSource<UserTableData>();
     dataDetail: UserTableData[];
     usersSubscription: Subscription;
+    userSubscription: ISubscription;
+    user: any;
     
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
     constructor(
         private dataService: DataService,
-        private authService: AuthService,
+        public authService: AuthService,
         private papa: PapaParseService
     ){ }
 
@@ -36,6 +38,13 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
             this.dataSource.data = entries;
         });
         this.dataService.getUsers()
+
+        this.userSubscription = this.authService.user$.subscribe(user => {
+            this.user = user
+            if(user.roles.admin){
+                this.displayedColumns.splice(2, 0, 'roles')
+            }
+        })
     }
 
     doFilter(filterValue: string) {
@@ -44,6 +53,7 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
 
     ngOnDestroy(){
         this.usersSubscription.unsubscribe();
+        this.userSubscription.unsubscribe();
     }
 
     ngAfterViewInit(){
