@@ -78,4 +78,32 @@ export class AuthService {
         return userRef.set(user, { merge: true });
       }
 
+      // role based activities
+
+      canLogin(user: User): boolean {
+        const allowed = ['admin', 'judge']
+        return this.checkAuthorization(user, allowed)
+      }
+
+      canUpdate(user: User): boolean{
+          const allowed = ['judge']
+          return this.checkAuthorization(user, allowed)
+      }
+
+      canChangePermissions(user: User): boolean{
+        const allowed = ['admin']
+        return this.checkAuthorization(user, allowed)
+      }
+
+      // determines if user has matching role
+      private checkAuthorization(user: User, allowedRoles: string[]): boolean {
+        if (!user) return false
+        for (const role of allowedRoles) {
+          if ( user.roles[role] ) {
+            return true
+          }
+        }
+        return false
+      }
+
 }

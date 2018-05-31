@@ -17,7 +17,7 @@ export const AppRoutes: Routes = [{
         children: [{
             path: 'dashboard',
             loadChildren: './dashboard/dashboard.module#DashboardModule',
-            canActivate: [AuthGuard, JudgeGuard, AdminGuard]
+            canActivate: [AuthGuard, AdminGuard]
         },{
             path: 'components',
             loadChildren: './components/components.module#ComponentsModule',
