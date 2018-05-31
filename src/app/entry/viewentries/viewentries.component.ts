@@ -7,6 +7,8 @@ import {EntryTableData} from '../../core/user.model';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { Subscription} from 'rxjs/Subscription';
 import { AngularFirestoreDocument} from 'angularfire2/firestore';
+import { PapaParseService } from 'ngx-papaparse';
+import * as moment from 'moment';
 
 declare var $:any;
 
@@ -27,13 +29,14 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     dataSource = new MatTableDataSource<EntryTableData>();
     dataDetail: EntryTableData[];
     private entriesSubscription: Subscription;
+    private emailSubscriptions: Subscription;
 
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
 
     constructor(
-        private afs: AngularFirestore, private dataService: DataService
+        private afs: AngularFirestore, private dataService: DataService, private papa : PapaParseService
     ) {}
 
     public dataTable: DataTable;
@@ -42,10 +45,12 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.entriesSubscription = this.dataService.entriesChanged.subscribe((entries: EntryTableData[]) => {
             
             entries.forEach((entry, index) => {
-                this.afs.collection('users')
+                this.emailSubscriptions = this.afs.collection('users')
                         .doc(entry['userId']).valueChanges()
                         .subscribe(res => {
-                            entry['email'] = res['email']
+                            if(res && entry){
+                                entry['email'] = res['email']
+                            }
                         });
             });
             
@@ -55,6 +60,23 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.dataService.fetchEntries();
     }
 
+    downloadSubmissionsCsv(){
+        let csvData = this.papa.unparse(this.dataSource.data,{header: true})
+        this.download(`Submissions - ${moment().format('MMM dd hhmmss')}`, csvData)
+     }
+
+     download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+      
+        element.style.display = 'none';
+        document.body.appendChild(element);
+      
+        element.click();
+      
+        document.body.removeChild(element);
+      }
 
 
     ngAfterViewInit(){
@@ -68,6 +90,6 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnDestroy(){
         this.entriesSubscription.unsubscribe();
-
+        this.emailSubscriptions.unsubscribe();
     }
 }

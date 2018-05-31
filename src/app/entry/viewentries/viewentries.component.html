@@ -4,6 +4,8 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-content">
+                            <button class="btn btn-default pull-right" (click)="downloadSubmissionsCsv()">Download CSV</button>
+                        
                         <div fxLayoutAlign="center center">
                             <mat-form-field fxFlex="40%">
                                 <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Filter">

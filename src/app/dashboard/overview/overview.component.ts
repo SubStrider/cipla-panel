@@ -39,8 +39,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     stageCount: any[] = [
         { name: 'ideation', count: 0 },
         { name: 'poc', count: 0 },
-        { name: 'revenues', count: 0 },
-        { name: 'other', count: 0 }
+        { name: 'revenues', count: 0 }
     ]
 
     weekCount: any[] = []
@@ -71,7 +70,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
         /*   **************** Submissions by Stage ********************    */
 
         var data = {
-            labels: ['Ideation', 'POC', 'Revenues',],
+            labels: ['Ideation', 'POC', 'Revenues'],
             series: [
                 [10, 10, 10]
             ]
@@ -220,7 +219,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                     let stageCount = 0;
                     this.totCount++;
                     this.checkArrayAndUpdate(this.catCount, value.category)
-                    this.checkArrayAndUpdate(this.stageCount, value.stage)
+                    this.checkArrayAndUpdate(this.stageCount, value.stage || 'ideation')
 
                     weekCount.push({
                         week: value.createdAt ? moment(value.createdAt).format('W') : '21',

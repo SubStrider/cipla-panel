@@ -18,7 +18,8 @@
         "testTsconfig": "tsconfig.spec.json",
         "prefix": "app",
         "styles": [
-            "styles.css"
+            "styles.css",
+            "../node_modules/print-js/dist/print.min.css"
         ],
         "scripts": [
             "../node_modules/jquery/dist/jquery.js",
@@ -40,7 +41,8 @@
             "../node_modules/bootstrap-tagsinput/dist/bootstrap-tagsinput.js",
             "../node_modules/jasny-bootstrap/dist/js/jasny-bootstrap.min.js",
             "../src/assets/js/sweetalert2.js",
-            "../src/assets/js/jquery.validate.min.js"
+            "../src/assets/js/jquery.validate.min.js",
+            "../node_modules/print-js/dist/print.min.js"
 
         ],
         "environmentSource": "environments/environment.ts",
