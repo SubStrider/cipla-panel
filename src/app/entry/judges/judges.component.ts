@@ -1,22 +1,13 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
+import { UserTableData } from '../../core/user.model';
+import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
+import { Subscription, ISubscription } from 'rxjs/Subscription';
+import { DataService } from '../../core/data.service';
+import { AuthService } from '../../core/auth.service';
+import { PapaParseService } from 'ngx-papaparse';
+import * as moment from 'moment';
 
 declare var $:any;
-
-declare interface Table_With_Checkboxes {
-    id?: number;
-    name: string;
-    job_position: string;
-    salary: string;
-    active?: boolean;
-}
-declare interface TableData {
-    headerRow: string[];
-    dataRows: string[][];
-}
-declare interface TableData2 {
-    headerRow: string[];
-    dataRows: Table_With_Checkboxes[];
-}
 
 @Component({
     moduleId: module.id,
@@ -24,58 +15,77 @@ declare interface TableData2 {
     templateUrl: 'judges.component.html'
 })
 
-export class JudgesComponent implements OnInit{
-    public tableData1: TableData;
-    public tableData2: TableData2;
-    public tableData3: TableData;
-    ngOnInit(){
+export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
 
-        this.tableData1 = {
-            headerRow: [ '#', 'Name', 'Job Position', 'Since', 'Salary', 'Actions'],
-            dataRows: [
-                ['1', 'Andrew Mike', 'Develop', '2013', '99,225',''],
-                ['2', 'John Doe', 'Design', '2012', '89,241', ''],
-                ['3', 'Alex Mike', 'Design', '2010', '92,144', ''],
-                ['4','Mike Monday', 'Marketing', '2013', '49,990', ''],
-                ['5', 'Paul Dickens', 'Communication', '2015', '69,201', '']
-            ]
-        };
-        this.tableData2 = {
-            headerRow: [ '#', 'Name', 'Job Position', 'Salary', 'Active' ],
-            dataRows: [
-                {id: 1, name: 'Andrew Mike', job_position: 'Develop', salary: '99,225', active: false},
-                {id: 2, name: 'John Doe', job_position: 'Design', salary: '89,241', active: false},
-                {id: 3, name: 'Alex Mike', job_position: 'Design', salary: '92,144', active: true},
-                {id: 4, name: 'Mike Monday', job_position: 'Marketing', salary: '49,990', active: true}
-            ]
-        };
-        this.tableData3 = {
-            headerRow: [ '', '', 'Price', 'Quantity', 'Total'],
-            dataRows: [
-                ['entry/agenda.png', 'Get Shit Done Notebook', 'Most beautiful agenda for the office.', '49', '1','549'],
-                ['entry/stylus.jpg', 'Stylus',  'Design is not just what it looks like and feels like. Design is how it works.', '499', '2', '998'],
-                ['entry/evernote.png', 'Evernote iPad Stander', 'A groundbreaking Retina display. All-flash architecture. Fourth-generation Intel processors.', '799', '1', '799']
-            ]
-        };
+    displayedColumns = ['name', 'email', 'phone','actions'];
+    dataSource = new MatTableDataSource<UserTableData>();
+    dataDetail: UserTableData[];
+    usersSubscription: Subscription;
+    userSubscription: ISubscription;
+    user: any;
+    
+    @ViewChild(MatSort) sort: MatSort;
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+
+    constructor(
+        private dataService: DataService,
+        public authService: AuthService,
+        private papa: PapaParseService
+    ){ }
+
+    ngOnInit(){
+        this.usersSubscription = this.dataService.usersChanged.subscribe((entries: UserTableData[]) => {
+            this.dataSource.data = entries;
+        });
+        this.dataService.getUsers()
+
+        this.userSubscription = this.authService.user$.subscribe(user => {
+            this.user = user
+            if(user.roles.admin){
+                this.displayedColumns.splice(2, 0, 'roles')
+            }
+        })
+    }
+
+    doFilter(filterValue: string) {
+        this.dataSource.filter = filterValue.trim().toLowerCase();
+    }
+
+    ngOnDestroy(){
+        this.usersSubscription.unsubscribe();
+        this.userSubscription.unsubscribe();
     }
 
     ngAfterViewInit(){
-        // Init Tooltips
-        $('[rel="tooltip"]').tooltip();
-
-        $('.switch-plain').bootstrapSwitch({
-            onColor:'',
-            onText: '',
-            offText: ''
-        });
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
+        console.log(this.dataSource);
     }
 
-    getTotal(){
-        var total = 0;
-        for( var i = 0; i < this.tableData3.dataRows.length; i++ ){
-            var integer = parseInt(this.tableData3.dataRows[i][5])
-            total += integer;
-        }
-        return total;
-    };
+    updateUser(user){
+        console.log(user)
+        this.authService.updateUserData(user).then(r => {
+            console.log('profile updated')
+        }).catch(error => {
+            console.error('Some error occurred', error)
+        })
+    }
+
+    downloadUserCsv(){
+       let csvData = this.papa.unparse(this.dataSource.data,{header: true})
+       this.download(`Users - ${moment().format('MMM dd hhmmss')}`, csvData)
+    }
+
+    download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+      
+        element.style.display = 'none';
+        document.body.appendChild(element);
+      
+        element.click();
+      
+        document.body.removeChild(element);
+      }
 }

@@ -1,68 +1,11 @@
 <div class="main-content">
     <div class="container-fluid">
-        <!--<div class="row">-->
-            <!--<div class="col-md-12">-->
-                <!--&lt;!&ndash;<h4 class="title">DataTables.net</h4>&ndash;&gt;-->
-                <!--&lt;!&ndash;<p class="category">View all entries submitted so far.</p>&ndash;&gt;-->
-
-                <!--&lt;!&ndash;<br>&ndash;&gt;-->
-                <!--<div class="card">-->
-                    <!--<div class="card-content">-->
-                        <!--&lt;!&ndash;<h4 class="card-title">DataTables.net</h4>&ndash;&gt;-->
-                        <!--<div class="toolbar">-->
-                            <!--&lt;!&ndash;        Here you can write extra buttons/actions for the toolbar              &ndash;&gt;-->
-                        <!--</div>-->
-                        <!--<div class="fresh-table">-->
-                            <!--<table id="datatables" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">-->
-                                <!--<thead>-->
-                                    <!--<tr>-->
-                                      <!--<th>{{ dataTable.headerRow[0] }}</th>-->
-                                      <!--<th>{{ dataTable.headerRow[1] }}</th>-->
-                                      <!--<th>{{ dataTable.headerRow[2] }}</th>-->
-                                      <!--<th>{{ dataTable.headerRow[3] }}</th>-->
-                                      <!--<th>{{ dataTable.headerRow[4] }}</th>-->
-                                      <!--<th class="disabled-sorting">{{ dataTable.headerRow[5] }}</th>-->
-                                    <!--</tr>-->
-                                <!--</thead>-->
-                                <!--<tfoot>-->
-                                    <!--<tr>-->
-                                      <!--<th>{{ dataTable.footerRow[0] }}</th>-->
-                                      <!--<th>{{ dataTable.footerRow[1] }}</th>-->
-                                      <!--<th>{{ dataTable.footerRow[2] }}</th>-->
-                                      <!--<th>{{ dataTable.footerRow[3] }}</th>-->
-                                      <!--<th>{{ dataTable.footerRow[4] }}</th>-->
-                                      <!--<th>{{ dataTable.footerRow[5] }}</th>-->
-                                    <!--</tr>-->
-                                <!--</tfoot>-->
-                                <!--<tbody>-->
-                                    <!--<tr *ngFor="let row of dataRows | async">-->
-                                        <!--<td>{{row.teamName }}</td>-->
-                                        <!--<td>{{row.category}}</td>-->
-                                        <!--<td>{{row.stage}}</td>-->
-                                        <!--<td>{{row.r1Score}}</td>-->
-                                        <!--<td>{{row.r2Score}}</td>-->
-                                        <!--<td>-->
-                                            <!--<button class="btn btn-simple btn-info btn-icon like"><i class="ti-eye"></i></button>-->
-                                            <!--<button class="btn btn-simple btn-warning btn-icon edit"><i class="ti-pulse"></i></button>-->
-                                            <!--<button class="btn btn-simple btn-danger btn-icon remove"><i class="ti-check-box"></i></button>-->
-                                        <!--</td>-->
-
-                                    <!--</tr>-->
-                                <!--</tbody>-->
-                            <!--</table>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                    <!--&lt;!&ndash; end content&ndash;&gt;-->
-                <!--</div>-->
-                <!--&lt;!&ndash;  end card  &ndash;&gt;-->
-            <!--</div>-->
-            <!--&lt;!&ndash; end col-md-12 &ndash;&gt;-->
-        <!--</div>-->
-        <!-- end row -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-content">
+                            <button class="btn btn-default pull-right" (click)="downloadSubmissionsCsv()">Download CSV</button>
+                        
                         <div fxLayoutAlign="center center">
                             <mat-form-field fxFlex="40%">
                                 <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Filter">
@@ -72,7 +15,7 @@
                         <mat-table [dataSource]="dataSource" matSort >
                             <ng-container matColumnDef="teamName">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Team Name</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.teamName }}</mat-cell>
+                                <mat-cell *matCellDef="let element">{{ element.teamName || 'No team name' }}<br><small>{{element.email}}</small></mat-cell>
                             </ng-container>
 
                             <ng-container matColumnDef="category">
@@ -82,7 +25,7 @@
 
                             <ng-container matColumnDef="stage">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Stage</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.stage | titlecase }}</mat-cell>
+                                <mat-cell *matCellDef="let element">{{ element.stage || 'ideation' | titlecase }}</mat-cell>
                             </ng-container>
 
                             <ng-container matColumnDef="r1Score">

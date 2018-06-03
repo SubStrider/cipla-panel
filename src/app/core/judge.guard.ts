@@ -4,10 +4,12 @@ import { Observable } from 'rxjs/Observable';
 import { AuthService } from './auth.service';
 import { tap, map, take } from 'rxjs/operators';
 
+
 @Injectable()
-export class AdminGuard implements CanActivate {
+export class JudgeGuard implements CanActivate {
 
     constructor(private auth: AuthService) { }
+
 
     canActivate(
         next: ActivatedRouteSnapshot,
@@ -15,10 +17,17 @@ export class AdminGuard implements CanActivate {
 
         return this.auth.user$.pipe(
             take(1),
-            map(user => user && this.auth.canLogin(user) ? true : false),
-            tap(canLogin => {
-                if (!canLogin) {
-                    console.error('Access denied - Only admins and judges are allowed to login')
+            map(user => {
+                if (user) {
+                    return user.roles.admin || user.roles.judge
+                } else {
+                    return false;
+                }
+                // user && user.roles.admin ? true : false
+            }),
+            tap(isAdmin => {
+                if (!isAdmin) {
+                    console.error('Access denied - Judges / Admins only')
                 }
             })
         );

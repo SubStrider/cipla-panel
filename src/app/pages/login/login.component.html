@@ -33,6 +33,10 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-4 col-sm-6 col-md-offset-4 col-sm-offset-3">
+                        <div class="alert alert-danger" *ngIf="error">
+                            <h3>An Error Occurred</h3>
+                            <p>{{error.message || error}}</p>
+                        </div>
                         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
                             <div class="card" data-background="color" data-color="blue">
                                 <div class="card-header">

@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { HttpModule } from '@angular/http';
 import { APP_BASE_HREF } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PapaParseModule } from 'ngx-papaparse';
 
 import { AppComponent }   from './app.component';
 
@@ -27,6 +28,7 @@ import {DataService} from './core/data.service';
 import {MaterialModule} from './material.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AdminGuard} from './core/admin.guard';
+import { JudgeGuard } from './core/judge.guard';
 
 @NgModule({
     imports: [
@@ -43,7 +45,8 @@ import {AdminGuard} from './core/admin.guard';
         AngularFireModule.initializeApp(environment.firebase),
         AngularFirestoreModule,
         AngularFireAuthModule,
-        MaterialModule
+        MaterialModule,
+        PapaParseModule
     ],
     declarations: [
         AppComponent,
@@ -54,7 +57,8 @@ import {AdminGuard} from './core/admin.guard';
         AuthGuard,
         AuthService,
         DataService,
-        AdminGuard
+        AdminGuard,
+        JudgeGuard
     ],
     bootstrap:    [ AppComponent ]
 })

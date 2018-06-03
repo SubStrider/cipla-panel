@@ -1,36 +1,48 @@
-import {AfterViewInit, Component, OnInit} from '@angular/core';
+import { AfterViewInit, Component, OnInit, OnDestroy, AfterViewChecked } from '@angular/core';
 import * as Chartist from 'chartist';
-import {EntryTableData} from '../../core/user.model';
-import {DataService} from '../../core/data.service';
-import {Observable} from 'rxjs/Observable';
-import { StatsData} from '../../core/user.model';
-import{ AngularFirestore } from 'angularfire2/firestore';
+import { EntryTableData } from '../../core/user.model';
+import { DataService } from '../../core/data.service';
+import { Observable } from 'rxjs/Observable';
+import { StatsData } from '../../core/user.model';
+import { AngularFirestore } from 'angularfire2/firestore';
+import * as _ from 'lodash';
+import * as moment from 'moment';
+import { ISubscription } from 'rxjs/Subscription';
 
-declare var $:any;
+declare var $: any;
 
 @Component({
-  selector: 'overview-cmp',
-  templateUrl: './overview.component.html'
+    selector: 'overview-cmp',
+    templateUrl: './overview.component.html'
 })
 
-export class OverviewComponent implements OnInit, AfterViewInit {
+export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     totCount = 0;
+    count: any = { total: 0, cipla: 0 };
     totCiplaR1 = 0;
     totCountR2 = 0;
     totCiplaR2 = 0;
-    catCountPharmaceutical = 0;
-    catCountMedical = 0;
-    catCountDevices = 0;
-    catCountHospital = 0;
-    catCountServices = 0;
-    catCountDigital = 0;
-    catCountDiagnostics = 0;
-    catCountOthers = 0;
-    catCountUndef = 0;
-    stgCountIdeation = 0;
-    stgCountPOC = 0;
-    stgCountRevenues = 0;
-    stgCountUndef = 0;
+    userSubscription: ISubscription;
+    statsSubscription: ISubscription;
+
+    catCount: any[] = [
+        { name: 'pharmaceutical', count: 0 },
+        { name: 'medical', count: 0 },
+        { name: 'hospital', count: 0 },
+        { name: 'devices', count: 0 },
+        { name: 'services', count: 0 },
+        { name: 'digital', count: 0 },
+        { name: 'diagnostics', count: 0 },
+        { name: 'other', count: 0 }
+    ]
+
+    stageCount: any[] = [
+        { name: 'ideation', count: 0 },
+        { name: 'poc', count: 0 },
+        { name: 'revenues', count: 0 }
+    ]
+
+    weekCount: any[] = []
 
     chartStage;
     chartCategory;
@@ -38,26 +50,27 @@ export class OverviewComponent implements OnInit, AfterViewInit {
 
     constructor(
         private dataService: DataService, private afs: AngularFirestore,
-    ) {}
+    ) { }
 
-    initCirclePercentage(){
+    initCirclePercentage() {
         $('#chartDashboard, #chartOrders, #chartNewVisitors, #chartSubscriptions, #chartDashboardDoc, #chartOrdersDoc').easyPieChart({
             lineWidth: 6,
             size: 160,
             scaleColor: false,
             trackColor: 'rgba(255,255,255,.25)',
             barColor: '#FFFFFF',
-            animate: ({duration: 5000, enabled: true})
+            animate: ({ duration: 5000, enabled: true })
         });
     }
 
-    ngOnInit(){
+    ngOnInit() {
         this.fetchStatsCount();
+        this.fetchUserCount();
 
         /*   **************** Submissions by Stage ********************    */
 
         var data = {
-            labels: ['Ideation', 'POC', 'Revenues',],
+            labels: ['Ideation', 'POC', 'Revenues'],
             series: [
                 [10, 10, 10]
             ]
@@ -88,7 +101,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
         /*  **************** Submissions by Week ******************** */
 
         var dataStock = {
-            labels: ['\'07','\'08','\'09', '\'10', '\'11', '\'12', '\'13', '\'14', 'Current'],
+            labels: ['\'07', '\'08', '\'09', '\'10', '\'11', '\'12', '\'13', '\'14', 'Current'],
             series: [
                 [22.20, 34.90, 42.28, 51.93, 62.21, 80.23, 62.21, 82.12, 102.50, 107.23]
             ]
@@ -99,7 +112,7 @@ export class OverviewComponent implements OnInit, AfterViewInit {
             //   height: "200px",
             axisY: {
                 offset: 40,
-                labelInterpolationFnc: function(value) {
+                labelInterpolationFnc: function (value) {
                     // return '$' + value;
                     return value;
                 }
@@ -149,12 +162,41 @@ export class OverviewComponent implements OnInit, AfterViewInit {
         this.chartCategory = new Chartist.Bar('#chartViews', dataViews, optionsViews, responsiveOptionsViews);
     }
 
-    ngAfterViewInit(){
+    ngAfterViewInit() {
         this.initCirclePercentage();
     }
 
-    fetchStatsCount(){
-        this.afs.collection('submissions')
+    checkArrayAndUpdate(arr: any[], name: string) {
+        if (name) {
+            let found = _.find(arr, { name: name })
+            if (found) {
+                _.find(arr, { name: name })['count'] += 1;
+            } else {
+                _.find(arr, { name: 'other' })['count'] += 1;
+            }
+        } else {
+            _.find(arr, { name: 'other' })['count'] += 1;
+        }
+    }
+
+    fetchUserCount() {
+        this.userSubscription = this.afs.collection('users')
+            .snapshotChanges()
+            .map(userArray => {
+                return userArray.map(user => {
+                    return user.payload.doc.data()
+                })
+            })
+            .subscribe(result => {
+                this.count['total'] = result.length
+                this.count['cipla'] = _.filter(result, user => {
+                    return user && user.email && user.email.includes('@cipla.com')
+                }).length
+            })
+    }
+
+    fetchStatsCount() {
+        this.statsSubscription = this.afs.collection('submissions')
             .snapshotChanges()
             .map(docArray => {
                 return docArray.map(doc => {
@@ -165,82 +207,57 @@ export class OverviewComponent implements OnInit, AfterViewInit {
                         stage: doc.payload.doc.data().stage,
                         attachment: doc.payload.doc.data().attachment,
                         userID: doc.payload.doc.data().userId,
+                        createdAt: doc.payload.doc.data().createdAt
                     };
                 });
             })
             .subscribe(result => {
-                result.forEach((value) => {
+                let weekCount = []
+
+                result.forEach(value => {
+                    let catCount = 0;
+                    let stageCount = 0;
                     this.totCount++;
-                    if (value.category === 'pharmaceutical') {
-                        this.catCountPharmaceutical++;
-                    }
-                    if (value.category === 'medical') {
-                        this.catCountMedical++;
-                    }
-                    if (value.category === 'devices') {
-                        this.catCountDevices++;
-                    }
-                    if (value.category === 'hospital') {
-                        this.catCountHospital++;
-                    }
-                    if (value.category === 'services') {
-                        this.catCountServices++;
-                    }
-                    if (value.category === 'digital') {
-                        this.catCountDigital++;
-                    }
-                    if (value.category === 'diagnostic') {
-                        this.catCountDiagnostics++;
-                    }
-                    if (value.category === 'others') {
-                        this.catCountOthers++;
-                    }
-                    if (value.category === undefined ) {
-                        this.catCountUndef++;
-                    }
-                    if (value.stage === 'ideation') {
-                        this.stgCountIdeation++;
-                    }
-                    if (value.stage === 'poc') {
-                        this.stgCountPOC++;
-                    }
-                    if (value.stage === 'revenues') {
-                        this.stgCountRevenues++;
-                    }
-                    if (value.stage === undefined ) {
-                        this.stgCountUndef++;
-                    }
+                    this.checkArrayAndUpdate(this.catCount, value.category)
+                    this.checkArrayAndUpdate(this.stageCount, value.stage || 'ideation')
+
+                    weekCount.push({
+                        week: value.createdAt ? moment(value.createdAt).format('W') : '21',
+                        weekNumber: value.createdAt ? `Week ${3 + parseInt(moment(value.createdAt).format('W')) - 20}` : 'Week 1 - 3',
+                        date: value.createdAt || moment('2018-05-24').toDate()
+                    })
+
                     this.afs.collection('users')
                         .doc(value.userID).valueChanges()
                         .subscribe(res => {
-                            if (res.email.indexOf('cipla.com') > 0) {
+                            if (res && res['email'] && res['email'].includes('@cipla.com')) {
                                 this.totCiplaR1++;
                             }
                         });
                 });
 
+                let weekData = _.chain(weekCount).sortBy('weekNumber').groupBy('weekNumber').value()
+
                 this.chartStage.update({
-                    labels: ['Ideation', 'POC', 'Revenues',],
-                    series: [
-                        [this.stgCountIdeation, this.stgCountPOC, this.stgCountRevenues]
-                    ]
+                    labels: _.map(this.stageCount, 'name'),
+                    series: [_.map(this.stageCount, 'count')]
                 });
+
                 this.chartCategory.update({
-                    labels: ['Pharma', 'Medical', 'Devices', 'Hospital', 'Services', 'Digital', 'Diagnostic', 'Others'],
-                    series: [
-                        [
-                            this.catCountPharmaceutical,
-                            this.catCountMedical,
-                            this.catCountDevices,
-                            this.catCountHospital,
-                            this.catCountServices,
-                            this.catCountDigital,
-                            this.catCountDiagnostics,
-                            this.catCountOthers
-                        ]
-                    ]
+                    labels: _.map(this.catCount, 'name'),
+                    series: [_.map(this.catCount, 'count')]
+                });
+
+                this.chartWeek.update({
+                    labels:_.keys(weekData),
+                    series: [_.map(_.values(weekData), 'length')]
                 });
             });
+    }
+
+    ngOnDestroy(){
+        this.userSubscription.unsubscribe();
+        this.statsSubscription.unsubscribe();
     }
 
 }

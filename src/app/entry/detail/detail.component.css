@@ -1,0 +1,6 @@
+@media print{
+    #submission{
+        height: 100%;
+        font-size: 12pt !important;
+    }
+}

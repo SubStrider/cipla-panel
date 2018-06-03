@@ -5,7 +5,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 
 import { User } from './user.model';
 import { AuthData } from './user.model';
-import {AngularFirestore} from 'angularfire2/firestore';
+import {AngularFirestore, AngularFirestoreDocument} from 'angularfire2/firestore';
 import {Observable} from 'rxjs/Observable';
 // import { TrainingService } from '../training/training.service';
 
@@ -20,7 +20,6 @@ export class AuthService {
     constructor(
         private router: Router,
         private afAuth: AngularFireAuth,
-        private route: ActivatedRoute,
         private afs: AngularFirestore,
     ) {
         //// Get auth data, then get firestore user document || null
@@ -60,19 +59,10 @@ export class AuthService {
     }
 
     login(authData: AuthData) {
-        this.returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/';
-        console.log(this.returnUrl);
-        localStorage.setItem('returnUrl', this.returnUrl);
+        
 
-        this.afAuth.auth
+        return this.afAuth.auth
             .signInWithEmailAndPassword(authData.email, authData.password)
-            .then(result => {
-                console.log(result);
-                this.router.navigateByUrl(this.returnUrl);
-            })
-            .catch(error => {
-                console.log(error);
-            });
     }
 
     logout() {
@@ -82,5 +72,38 @@ export class AuthService {
     isAuth() {
         return this.isAuthenticated;
     }
+
+    updateUserData(user) {
+        const userRef: AngularFirestoreDocument<User> = this.afs.doc(`users/${user.uid}`);
+        return userRef.set(user, { merge: true });
+      }
+
+      // role based activities
+
+      canLogin(user: User): boolean {
+        const allowed = ['admin', 'judge']
+        return this.checkAuthorization(user, allowed)
+      }
+
+      canUpdate(user: User): boolean{
+          const allowed = ['judge']
+          return this.checkAuthorization(user, allowed)
+      }
+
+      canChangePermissions(user: User): boolean{
+        const allowed = ['admin']
+        return this.checkAuthorization(user, allowed)
+      }
+
+      // determines if user has matching role
+      private checkAuthorization(user: User, allowedRoles: string[]): boolean {
+        if (!user) return false
+        for (const role of allowedRoles) {
+          if ( user.roles[role] ) {
+            return true
+          }
+        }
+        return false
+      }
 
 }
