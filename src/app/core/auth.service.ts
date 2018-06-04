@@ -85,7 +85,7 @@ export class AuthService {
         return this.checkAuthorization(user, allowed)
       }
 
-      canUpdate(user: User): boolean{
+      canJudge(user: User): boolean{
           const allowed = ['judge']
           return this.checkAuthorization(user, allowed)
       }
