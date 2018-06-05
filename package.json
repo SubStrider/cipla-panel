@@ -13,7 +13,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "predeploy": "npm run build",
-    "deploy": "s3-deploy './dist/**' --cwd './dist' --region ap-south-1 --bucket innoventure.socheers.net --signatureVersion v4 --profile socheers --cache 86400 --gzip"
+    "deploy": "s3-deploy './dist/admin/**' --cwd './dist/admin' --region ap-south-1 --bucket innoventure.socheers.net --signatureVersion v4 --profile socheers --cache 86400 --gzip"
   },
   "private": true,
   "dependencies": {

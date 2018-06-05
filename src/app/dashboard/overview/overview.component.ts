@@ -42,6 +42,9 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
         { name: 'revenues', count: 0 }
     ]
 
+    countryCount: any[] = [];
+    countries: string[] = [];
+
     weekCount: any[] = []
 
     chartStage;
@@ -61,6 +64,30 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             barColor: '#FFFFFF',
             animate: ({ duration: 5000, enabled: true })
         });
+    }
+
+    reset() {
+        this.catCount = [
+            { name: 'pharmaceutical', count: 0 },
+            { name: 'medical', count: 0 },
+            { name: 'hospital', count: 0 },
+            { name: 'devices', count: 0 },
+            { name: 'services', count: 0 },
+            { name: 'digital', count: 0 },
+            { name: 'diagnostics', count: 0 },
+            { name: 'other', count: 0 }
+        ]
+
+        this.stageCount = [
+            { name: 'ideation', count: 0 },
+            { name: 'poc', count: 0 },
+            { name: 'revenues', count: 0 }
+        ]
+
+        this.totCount = 0;
+        this.totCiplaR1 = 0;
+        this.totCountR2 = 0;
+        this.totCiplaR2 = 0;
     }
 
     ngOnInit() {
@@ -119,7 +146,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             },
             low: 10,
             height: "250px",
-            high: 110,
+            high: 300,
             classNames: {
                 point: 'ct-point ct-green',
                 line: 'ct-line ct-green'
@@ -188,11 +215,31 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 })
             })
             .subscribe(result => {
+
+
+                this.count = { total: 0, cipla: 0 };
                 this.count['total'] = result.length
                 this.count['cipla'] = _.filter(result, user => {
                     return user && user.email && user.email.includes('@cipla.com')
                 }).length
+
+                // console.log(_.toPairs(_.countBy(countries)))
+                // let countryCount = [];
+
+
+                // console.log(countryCount)
             })
+    }
+
+    addCountry(country: string){
+        this.countries.push(country);
+
+        this.countryCount = _.chain(this.countries).countBy().map((value, key) => {
+            return {
+                name: key,
+                count: value
+            }
+        }).value()
     }
 
     fetchStatsCount() {
@@ -212,7 +259,9 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 });
             })
             .subscribe(result => {
+                this.reset()
                 let weekCount = []
+                let countries = []
 
                 result.forEach(value => {
                     let catCount = 0;
@@ -233,6 +282,9 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                             if (res && res['email'] && res['email'].includes('@cipla.com')) {
                                 this.totCiplaR1++;
                             }
+                            if(res && res['country']){
+                                this.addCountry(res['country'])
+                            }
                         });
                 });
 
@@ -249,13 +301,13 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 });
 
                 this.chartWeek.update({
-                    labels:_.keys(weekData),
+                    labels: _.keys(weekData),
                     series: [_.map(_.values(weekData), 'length')]
                 });
             });
     }
 
-    ngOnDestroy(){
+    ngOnDestroy() {
         this.userSubscription.unsubscribe();
         this.statsSubscription.unsubscribe();
     }

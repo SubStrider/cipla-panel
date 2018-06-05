@@ -165,17 +165,30 @@
                     </div>
                 </div>
             </div>
-            <!--<div class="col-md-6">-->
-                <!--<div class="card">-->
-                    <!--<div class="card-header">-->
-                        <!--<h4 class="card-title">24 Hours Performance</h4>-->
-                        <!--<p class="category">Line Chart</p>-->
-                    <!--</div>-->
-                    <!--<div class="card-content">-->
-                        <!--<div id="chartPerformance"></div>-->
-                    <!--</div>-->
-                <!--</div>-->
-            <!--</div>-->
+            <div class="col-md-6" *ngIf="countryCount && countryCount.length">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">By Country</h4>
+                        <p class="category">Total Submissions</p>
+                    </div>
+                    <div class="card-content country" style="max-height: 280px; overflow-y: scroll;">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Country</th>
+                                    <th>Count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let country of countryCount">
+                                    <td>{{country.name | titlecase}}</td>
+                                    <td>{{country.count}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
