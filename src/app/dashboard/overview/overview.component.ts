@@ -283,7 +283,13 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                                 this.totCiplaR1++;
                             }
                             if(res && res['country']){
-                                this.addCountry(res['country'])
+                                if(res['country'].toLowerCase().includes('india')){
+                                    this.addCountry('india')
+                                } else {
+                                    this.addCountry('overseas')
+                                }
+                            } else {
+                                this.addCountry('india')
                             }
                         });
                 });
