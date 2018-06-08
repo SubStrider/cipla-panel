@@ -135,4 +135,8 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.selectedStage = null
         this.router.navigate(['/a/entry/viewentries'])
     }
+
+    scrollTop(){
+        $('.main-panel').scrollTop(0)
+    }
 }
