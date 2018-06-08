@@ -9,6 +9,7 @@ import { Subscription} from 'rxjs/Subscription';
 import { AngularFirestoreDocument} from 'angularfire2/firestore';
 import { PapaParseService } from 'ngx-papaparse';
 import * as moment from 'moment';
+import { ActivatedRoute, Router } from '@angular/router';
 
 declare var $:any;
 
@@ -30,13 +31,22 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     dataDetail: EntryTableData[];
     private entriesSubscription: Subscription;
     private emailSubscriptions: Subscription;
+    categories: string[] = ['pharmaceutical','medical','devices','hospital','services','digital','diagnostics'];
+    stages: string[] = ['ideation','poc','revenues'];
 
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
 
+    selectedCategory: string;
+    selectedStage: string;
+    selectedFilter: string;
 
     constructor(
-        private afs: AngularFirestore, private dataService: DataService, private papa : PapaParseService
+        private afs: AngularFirestore, 
+        private dataService: DataService, 
+        private papa : PapaParseService, 
+        private activatedRoute: ActivatedRoute,
+        private router: Router
     ) {}
 
     public dataTable: DataTable;
@@ -55,9 +65,16 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
             });
             
             this.dataSource.data = entries;
-            // console.log(entries);
         });
-        this.dataService.fetchEntries();
+
+        this.activatedRoute.queryParams.subscribe(params => {
+            this.selectedCategory = params['category']
+            this.selectedStage = params['stage']
+        this.dataService.fetchEntries(this.selectedCategory, this.selectedStage);
+        }, error => {
+            console.error(error)
+        })
+
     }
 
     downloadSubmissionsCsv(){
@@ -84,12 +101,38 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.dataSource.paginator = this.paginator;
     }
 
-    doFilter(filterValue: string) {
-        this.dataSource.filter = filterValue.trim().toLowerCase();
+    doFilter(filterValue?: string) {
+        if(filterValue && filterValue.length){
+            this.dataSource.filter = filterValue.trim().toLowerCase();
+        } else {
+            this.dataSource.filter = null
+        }
     }
 
     ngOnDestroy(){
         this.entriesSubscription.unsubscribe();
         this.emailSubscriptions.unsubscribe();
+    }
+
+    selectCategory(category){
+        this.router.navigate(['/a/entry/viewentries'], {queryParams: {category: category.value}, queryParamsHandling: 'merge'})
+    }
+
+    selectStage(stage){
+        this.router.navigate(['/a/entry/viewentries'], {queryParams: {stage: stage.value}, queryParamsHandling: 'merge'})
+    }
+
+    selectCipla(event){
+        if(event.checked){
+            this.doFilter('@cipla.com')
+        } else {
+            this.doFilter()
+        }
+    }
+
+    reset(){
+        this.selectedCategory = null
+        this.selectedStage = null
+        this.router.navigate(['/a/entry/viewentries'])
     }
 }

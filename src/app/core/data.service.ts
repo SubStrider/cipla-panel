@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import {BasicSubmission, EntryTableData, UserTableData} from './user.model';
+import { BasicSubmission, EntryTableData, UserTableData } from './user.model';
 import { AngularFirestore } from 'angularfire2/firestore';
-import {Subject} from 'rxjs/Subject';
+import * as firebase from 'firebase';
+import { Subject } from 'rxjs/Subject';
 import { StatsCount } from './user.model';
-import {Observable} from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import { User } from '@firebase/auth-types';
 
 @Injectable()
@@ -12,10 +13,16 @@ export class DataService {
     statsCount: StatsCount;
     usersChanged = new Subject<UserTableData[]>();
 
-    constructor(private afs: AngularFirestore ) { }
+    constructor(private afs: AngularFirestore) { }
 
-    fetchEntries(){
-        this.afs.collection('submissions')
+    fetchEntries(category?: string, stage?: string, minR1Score?: number, maxR1Score?: number) {
+
+        this.afs.collection('submissions', ref => {
+            let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
+            if (category) { query = query.where('category', '==', category) };
+            if (stage) { query = query.where('stage', '==', stage) };
+            return query;
+        })
             .snapshotChanges()
             .map(docArray => {
                 return docArray.map(doc => {
@@ -35,7 +42,6 @@ export class DataService {
             });
     }
 
-
     // statsCount(){
     //     this.afs.collection('submissions')
     //         .snapshotChanges()
@@ -46,8 +52,8 @@ export class DataService {
     //         });
     // }
 
-    
-    getUsers(){
+
+    getUsers() {
         this.afs.collection('users')
             .snapshotChanges()
             .map(userArray => {
