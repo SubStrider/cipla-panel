@@ -12,7 +12,7 @@ import { JudgeComponent } from './judge/judge.component';
 @NgModule({
     imports: [
         CommonModule,
-        RouterModule.forChild(DashboardRoutes),
+        // RouterModule.forChild(DashboardRoutes),
         FormsModule
     ],
     declarations: [OverviewComponent, StatsComponent, UserComponent, JudgeComponent]

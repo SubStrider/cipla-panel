@@ -29,13 +29,15 @@ import {MaterialModule} from './material.module';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {AdminGuard} from './core/admin.guard';
 import { JudgeGuard } from './core/judge.guard';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { EntryModule } from './entry/entry.module';
 
 @NgModule({
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
         FormsModule,
-        RouterModule.forRoot(AppRoutes),
+        RouterModule.forRoot(AppRoutes, {enableTracing: false}),
         HttpModule,
         HttpClientModule,
         SidebarModule,
@@ -46,7 +48,9 @@ import { JudgeGuard } from './core/judge.guard';
         AngularFirestoreModule,
         AngularFireAuthModule,
         MaterialModule,
-        PapaParseModule
+        PapaParseModule,
+        DashboardModule,
+        EntryModule
     ],
     declarations: [
         AppComponent,

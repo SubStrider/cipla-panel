@@ -21,6 +21,7 @@ export class AuthService {
         private router: Router,
         private afAuth: AngularFireAuth,
         private afs: AngularFirestore,
+        private activatedRoute: ActivatedRoute
     ) {
         //// Get auth data, then get firestore user document || null
         this.user$ = this.afAuth.authState
@@ -38,7 +39,12 @@ export class AuthService {
             if (user) {
                 this.isAuthenticated = true;
                 this.authChange.next(true);
-                this.router.navigate(['/']);
+                this.activatedRoute.queryParams.subscribe(params => {
+                    // console.log(params['returnUrl'])
+                    if(params['returnUrl']){
+                        this.router.navigate([params.returnUrl])
+                    }
+                })
             } else {
                 // this.trainingService.cancelSubscriptions();
                 this.authChange.next(false);

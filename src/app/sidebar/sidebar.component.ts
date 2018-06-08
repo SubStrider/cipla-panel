@@ -87,21 +87,21 @@ export const ROUTES: RouteInfo[] = [
     //
     // },
     {
-        path: '/dashboard/overview',
+        path: 'dashboard/overview',
         title: 'Dashboard',
         type: 'link',
         icontype: 'ti-panel'
 
     },
     {
-        path: '/entry/viewentries',
+        path: 'entry/viewentries',
         title: 'View Entries',
         type: 'link',
         icontype: 'ti-view-list-alt'
 
     },
     {
-        path: '/entry/judges',
+        path: 'entry/judges',
         title: 'Manage Judges',
         type: 'link',
         icontype: 'ti-id-badge'
