@@ -53,10 +53,7 @@
                                     </div>
                                 </div>
                                 <div class="card-footer text-center">
-                                    <button type="submit" class="btn btn-fill btn-wd " [disabled]="loginForm.invalid">Submit</button>
-                                    <div class="forgot">
-                                        <a href="#pablo">Forgot your password?</a>
-                                    </div>
+                                    <button type="submit" class="btn btn-fill btn-wd" [disabled]="loginForm.invalid || loading">{{loading ? 'Loading...' : 'Login'}}</button>
                                 </div>
                             </div>
                         </form>
