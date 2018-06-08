@@ -42,7 +42,18 @@ export class AuthService {
                 this.activatedRoute.queryParams.subscribe(params => {
                     // console.log(params['returnUrl'])
                     if(params['returnUrl']){
-                        this.router.navigate([params.returnUrl])
+                        let Url;
+                        let queryParams = {};
+
+                        if(params['returnUrl'].includes('?')){
+                            let broken = params['returnUrl'].split('?')
+                            Url = broken[0]
+                            // queryParams = broken[1]
+                        } else {
+                            Url = params['returnUrl']
+                        }
+
+                        this.router.navigate([Url])
                     }
                 })
             } else {

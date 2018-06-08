@@ -1,21 +1,47 @@
 <div class="main-content">
     <div class="container-fluid">
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-12 mb-2">
+                <button class="btn btn-default pull-right" (click)="downloadSubmissionsCsv()">Download CSV</button>
+
+                <div fxLayoutAlign="center center">
+                    <mat-form-field fxFlex="100%">
+                        <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Start Searching by any term">
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="col-12">
                 <div class="card">
                     <div class="card-content">
-                            <button class="btn btn-default pull-right" (click)="downloadSubmissionsCsv()">Download CSV</button>
-                        
-                        <div fxLayoutAlign="center center">
-                            <mat-form-field fxFlex="40%">
-                                <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Filter">
-                            </mat-form-field>
+                        <div class="row">
+                            <div class="col-xs-6 col-md-2">
+                                <mat-form-field>
+                                    <mat-select placeholder="Category" (change)="selectCategory($event)" [ngModel]="selectedCategory">
+                                        <mat-option *ngFor="let category of categories" [value]="category">{{category | titlecase}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-xs-6 col-md-2">
+                                <mat-form-field>
+                                    <mat-select placeholder="Stage" (change)="selectStage($event)" [ngModel]="selectedStage">
+                                        <mat-option *ngFor="let stage of stages" [value]="stage">{{stage | titlecase}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                            <div class="col-xs-6 col-md-2">
+                                <mat-checkbox (change)="selectCipla($event)">Show only Cipla entries</mat-checkbox>
+                            </div>
+                            <div class="col-xs-6 col-md-4">
+                                <button type="button" class="btn btn-default" (click)="reset()">Reset</button>
+                            </div>
                         </div>
-
-                        <mat-table [dataSource]="dataSource" matSort >
+                        <mat-table [dataSource]="dataSource" matSort>
                             <ng-container matColumnDef="teamName">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Team Name</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.teamName || 'No team name' }}<br><small class="text-success">{{element.email}}</small></mat-cell>
+                                <mat-cell *matCellDef="let element">{{ element.teamName || 'No team name' }}
+                                    <br>
+                                    <small class="text-success">{{element.email}}</small>
+                                </mat-cell>
                             </ng-container>
 
                             <ng-container matColumnDef="category">
@@ -54,7 +80,7 @@
                             <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
                         </mat-table>
 
-                        <mat-paginator #paginator [pageSize]="100" [pageSizeOptions]="[50, 100, 200]" >
+                        <mat-paginator #paginator [pageSize]="100" [pageSizeOptions]="[50, 100, 200]">
                         </mat-paginator>
                     </div>
                 </div>

@@ -41,8 +41,9 @@ export const AppRoutes: Routes = [
                 children: [
                     {
                         path: 'viewentries',
-                        component: ViewentriesComponent,
-                    }, {
+                        component: ViewentriesComponent
+                    },
+                    {
                         path: 'detail/:id',
                         component: DetailComponent
                     },
