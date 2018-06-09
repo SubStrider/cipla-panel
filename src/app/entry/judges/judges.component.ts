@@ -23,6 +23,7 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
     usersSubscription: Subscription;
     userSubscription: ISubscription;
     user: any;
+    // loading: boolean;
     
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -63,11 +64,13 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
     }
 
     updateUser(user){
-        console.log(user)
+        user.loading = true;
         this.authService.updateUserData(user).then(r => {
             console.log('profile updated')
+            user.loading = false;
         }).catch(error => {
             console.error('Some error occurred', error)
+            user.loading = false;
         })
     }
 

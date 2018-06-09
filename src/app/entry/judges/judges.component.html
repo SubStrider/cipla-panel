@@ -27,10 +27,11 @@
                                     <mat-cell *matCellDef="let element">{{ element.phone }}</mat-cell>
                                 </ng-container>
 
-                            <ng-container matColumnDef="roles">
-                                <mat-header-cell *matHeaderCellDef mat-sort-header [hidden]="!(user && user.roles.admin)">Roles</mat-header-cell>
-                                <mat-cell *matCellDef="let element" [hidden]="!(user && user.roles.admin)">
+                            <ng-container matColumnDef="roles" *ngIf="authService.canChangePermissions(user)">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header>Roles</mat-header-cell>
+                                <mat-cell *matCellDef="let element">
                                     <mat-checkbox [(ngModel)]="element.roles.judge">Judge</mat-checkbox>
+                                    <mat-checkbox [(ngModel)]="element.roles.superjudge">Super Judge</mat-checkbox>
                                     <mat-checkbox [(ngModel)]="element.roles.admin">Admin</mat-checkbox>
                                 </mat-cell>
                             </ng-container>
@@ -41,9 +42,9 @@
                                     <a class="btn btn-icon btn-google">
                                         <span data-notify="icon" class="ti-stats-up"></span>
                                     </a>
-                                    <a class="btn btn-icon btn-fill btn-tumblr" (click)="updateUser(element)">
-                                        <span data-notify="icon" class="ti-angle-right"></span>
-                                    </a>
+                                    <button class="btn btn-icon btn-fill btn-tumblr" (click)="updateUser(element)" [disabled]="element.loading">
+                                        <span data-notify="icon" class="ti-check" [ngClass]="{'ti-check':!element.loading, 'ti-more': element.loading}"></span>
+                                    </button>
                                 </mat-cell>
                             </ng-container>
 
