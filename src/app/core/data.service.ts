@@ -15,6 +15,17 @@ export class DataService {
 
     constructor(private afs: AngularFirestore) { }
 
+    getNumberId(id) {
+        let last: string = id.substr(id.length - 3);
+        let number:string = 'Sub-';
+        for(let i = 0; i < last.length; i++){
+            let n = Math.abs(last[i].charCodeAt(0) - 97)
+            number += n
+        }
+        
+        return number;
+    }
+
     fetchEntries(category?: string, stage?: string, minR1Score?: number, maxR1Score?: number) {
 
         this.afs.collection('submissions', ref => {
@@ -33,7 +44,8 @@ export class DataService {
                         r1Score: doc.payload.doc.data().r1Score,
                         r2Score: doc.payload.doc.data().r2Score,
                         submissionId: doc.payload.doc.id,
-                        userId: doc.payload.doc.data().userId
+                        userId: doc.payload.doc.data().userId,
+                        numericId: this.getNumberId(doc.payload.doc.id)
                     };
                 });
             })
@@ -41,16 +53,6 @@ export class DataService {
                 this.entriesChanged.next(fetchedEntries);
             });
     }
-
-    // statsCount(){
-    //     this.afs.collection('submissions')
-    //         .snapshotChanges()
-    //         .subscribe(result => {
-    //             for (const res of result) {
-    //                 console.log(res.payload.doc.data());
-    //             }
-    //         });
-    // }
 
 
     getUsers() {

@@ -112,6 +112,11 @@ export class AuthService {
         return this.checkAuthorization(user, allowed)
       }
 
+      canChangeScore(user: User): boolean{
+          const allowed = ['superjudge']
+          return this.checkAuthorization(user, allowed)
+      }
+
       // determines if user has matching role
       private checkAuthorization(user: User, allowedRoles: string[]): boolean {
         if (!user) return false

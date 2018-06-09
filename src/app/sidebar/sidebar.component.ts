@@ -102,7 +102,7 @@ export const ROUTES: RouteInfo[] = [
     },
     {
         path: 'entry/judges',
-        title: 'Manage Judges',
+        title: 'Manage Users',
         type: 'link',
         icontype: 'ti-id-badge'
 

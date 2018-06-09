@@ -58,6 +58,7 @@ export interface EntryTableData {
     r1Score: number;
     r2Score: number;
     submissionId: string;
+    numericId: string;
 }
 
 export interface StatsData {
