@@ -26,7 +26,7 @@ declare interface DataTable {
 
 export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     // dataRows: Observable<EntryTableData[]>;
-    displayedColumns = ['teamName', 'category', 'stage', 'r1Score', 'r2Score', 'actions'];
+    displayedColumns = ['numericId','teamName', 'category', 'stage', 'r1Score', 'r2Score', 'actions'];
     dataSource = new MatTableDataSource<EntryTableData>();
     dataDetail: EntryTableData[];
     private entriesSubscription: Subscription;
