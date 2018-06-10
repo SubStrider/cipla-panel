@@ -1,5 +1,8 @@
-import {Component, OnInit} from '@angular/core';
-import {AuthService} from './core/auth.service';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from './core/auth.service';
+import { Router, NavigationEnd } from '@angular/router';
+
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-root',
@@ -8,9 +11,19 @@ import {AuthService} from './core/auth.service';
 })
 
 export class AppComponent implements OnInit {
-  constructor(private authService: AuthService){}
+  constructor(private authService: AuthService, private router: Router) { }
 
-  ngOnInit(){
+  ngOnInit() {
     this.authService.initAuthListener();
+    this.router.events.subscribe((evt) => {
+      if (!(evt instanceof NavigationEnd)) {
+        return;
+      }
+      window.scrollTo(0,0)
+
+      if($('.main-panel')){
+        $('.main-panel').scrollTop(0)
+      }
+    });
   }
 }
