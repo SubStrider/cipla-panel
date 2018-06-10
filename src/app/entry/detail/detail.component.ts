@@ -23,12 +23,12 @@ export class DetailComponent implements OnInit, OnDestroy {
     judgeEntry: JudgeEntry;
     judgeId: string;
     user: User;
-    
+
     // Error object
     error: any = {};
 
     // Loading object
-    loading: any = { preScreen: false, judging: false};
+    loading: any = { preScreen: false, judging: false };
 
     //Pre Screen Variables for 2 way binding
     health: string;
@@ -81,7 +81,7 @@ export class DetailComponent implements OnInit, OnDestroy {
         })
     }
 
-    changePreScreen(event){
+    changePreScreen(event) {
         console.log(event)
         let value: any = {}
         value[event.source.name] = event.value === '1' ? true : false
@@ -93,13 +93,13 @@ export class DetailComponent implements OnInit, OnDestroy {
         this.userSubmission = this.afs.collection('submissions')
             .doc(this.submissionId)
             .valueChanges()
-            
-        this.userSubmission.subscribe( data => {
+
+        this.userSubmission.subscribe(data => {
             console.log(data)
-            if(data['preScreen']){
-                this.health = data['preScreen'].health ? '1': '0';
-                this.revenue = data['preScreen'].revenue ? '1': '0';
-                this.preScreenForm.setValue({health: this.health, revenue: this.revenue})
+            if (data['preScreen']) {
+                this.health = data['preScreen'].health ? '1' : '0';
+                this.revenue = data['preScreen'].revenue ? '1' : '0';
+                this.preScreenForm.setValue({ health: this.health, revenue: this.revenue })
             }
         })
 
@@ -170,14 +170,21 @@ export class DetailComponent implements OnInit, OnDestroy {
 
     submitPreScreen() {
         this.loading['preScreen'] = true
-        this.dataService.updateSubmission(this.submissionId, {preScreen: this.preScreenForm.value})
-            .then( res => {
-        this.loading['preScreen'] = false
+        let preScreen = this.preScreenForm.value
+        let status: string = null;
+        if (preScreen.health && preScreen.revenue) {
+            status = 'approved'
+        } else {
+            status = 'rejected'
+        }
+        this.dataService.updateSubmission(this.submissionId, { preScreen: preScreen, status: status })
+            .then(res => {
+                this.loading['preScreen'] = false
                 console.log("Transaction successfully committed!");
             })
-            .catch(error => { 
-        this.loading['preScreen'] = false
-                console.error("Transaction failed: ", error); 
+            .catch(error => {
+                this.loading['preScreen'] = false
+                console.error("Transaction failed: ", error);
             });
 
     }
