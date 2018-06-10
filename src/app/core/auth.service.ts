@@ -103,7 +103,7 @@ export class AuthService {
       }
 
       canJudge(user: User): boolean{
-          const allowed = ['judge']
+          const allowed = ['judge', 'superjudge']
           return this.checkAuthorization(user, allowed)
       }
 

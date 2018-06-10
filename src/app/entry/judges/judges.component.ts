@@ -17,7 +17,7 @@ declare var $:any;
 
 export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
 
-    displayedColumns = ['name', 'email', 'phone','actions'];
+    displayedColumns = ['name', 'email', 'phone','roles','actions'];
     dataSource = new MatTableDataSource<UserTableData>();
     dataDetail: UserTableData[];
     usersSubscription: Subscription;
@@ -42,9 +42,9 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
 
         this.userSubscription = this.authService.user$.subscribe(user => {
             this.user = user
-            if(user.roles.admin){
-                this.displayedColumns.splice(2, 0, 'roles')
-            }
+            // if(user.roles.admin && !this.displayedColumns.includes['roles']){
+            //     this.displayedColumns.splice(2, 0, 'roles')
+            // }
         })
     }
 

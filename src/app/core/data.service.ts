@@ -75,5 +75,9 @@ export class DataService {
             })
     }
 
+    updateSubmission(submissionId: string, value: any){
+        return this.afs.collection('submissions').doc(submissionId).update(value)
+    }
+
 }
 
