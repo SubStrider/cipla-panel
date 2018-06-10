@@ -55,38 +55,6 @@ export const AppRoutes: Routes = [
             }
         ]
     },
-    // {
-    //     path: '',
-    //     component: AdminLayoutComponent,
-    //     children: [{
-    //         path: 'dashboard',
-    //         loadChildren: './dashboard/dashboard.module#DashboardModule',
-    //         canActivate: [AuthGuard, AdminGuard]
-    //     }, {
-    //         path: 'components',
-    //         loadChildren: './components/components.module#ComponentsModule',
-    //         canActivate: [AuthGuard, AdminGuard]
-    //     }, {
-    //         path: 'forms',
-    //         loadChildren: './forms/forms.module#Forms',
-    //         canActivate: [AuthGuard, AdminGuard]
-    //     }, {
-    //         path: 'entry',
-    //         loadChildren: './entry/entry.module#EntryModule'
-    //     }, {
-    //         path: 'charts',
-    //         loadChildren: './charts/charts.module#ChartsModule',
-    //         canActivate: [AuthGuard, AdminGuard]
-    //     },
-    // {
-    //     path: '',
-    //     loadChildren: './userpage/user.module#UserModule',
-    // }, {
-    //     path: '',
-    //     loadChildren: './timeline/timeline.module#TimelineModule'
-    // }
-    // ]
-    //     },
     {
         path: '',
         component: AuthLayoutComponent,
