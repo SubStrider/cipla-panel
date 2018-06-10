@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 import { TablesRoutes } from './entry.routing';
 
@@ -16,7 +16,8 @@ import { DetailComponent } from './detail/detail.component';
         CommonModule,
         RouterModule.forChild(TablesRoutes),
         FormsModule,
-        MaterialModule
+        MaterialModule,
+        ReactiveFormsModule
     ],
     exports: [
     ],
