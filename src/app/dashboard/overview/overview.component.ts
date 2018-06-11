@@ -22,6 +22,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     totCiplaR1 = 0;
     totCountR2 = 0;
     totCiplaR2 = 0;
+    judged: number = 0;
     userSubscription: ISubscription;
     statsSubscription: ISubscription;
 
@@ -254,7 +255,8 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                         stage: doc.payload.doc.data().stage,
                         attachment: doc.payload.doc.data().attachment,
                         userID: doc.payload.doc.data().userId,
-                        createdAt: doc.payload.doc.data().createdAt
+                        createdAt: doc.payload.doc.data().createdAt,
+                        status: doc.payload.doc.data().status
                     };
                 });
             })
@@ -263,12 +265,18 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 let weekCount = []
                 let countries = []
 
+                let judged = 0;
+
                 result.forEach(value => {
                     let catCount = 0;
                     let stageCount = 0;
                     this.totCount++;
                     this.checkArrayAndUpdate(this.catCount, value.category)
                     this.checkArrayAndUpdate(this.stageCount, value.stage || 'ideation')
+
+                    if(value.status){
+                        judged++
+                    }
 
                     weekCount.push({
                         week: value.createdAt ? moment(value.createdAt).format('W') : '21',
@@ -310,6 +318,8 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                     labels: _.keys(weekData),
                     series: [_.map(_.values(weekData), 'length')]
                 });
+
+                this.judged = judged / this.totCount
             });
     }
 
