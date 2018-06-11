@@ -10,7 +10,7 @@ import { ViewentriesComponent } from './viewentries/viewentries.component';
 import {MaterialModule} from '../material.module';
 import { DetailComponent } from './detail/detail.component';
 import { MatRadioModule, MatRadioButton } from '@angular/material/radio';
-
+import {MatSliderModule} from '@angular/material/slider';
 
 @NgModule({
     imports: [
@@ -19,7 +19,8 @@ import { MatRadioModule, MatRadioButton } from '@angular/material/radio';
         FormsModule,
         MaterialModule,
         ReactiveFormsModule,
-        MatRadioModule
+        MatRadioModule,
+        MatSliderModule
     ],
     exports: [
     ],

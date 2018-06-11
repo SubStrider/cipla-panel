@@ -15,23 +15,27 @@ export class DataService {
 
     constructor(private afs: AngularFirestore) { }
 
-    getNumberId(id) {
+    public getNumberId(id) {
         let last: string = id.substr(id.length - 3);
-        let number:string = 'Sub-';
-        for(let i = 0; i < last.length; i++){
+        let number: string = 'Sub-';
+        for (let i = 0; i < last.length; i++) {
             let n = Math.abs(last[i].charCodeAt(0) - 97)
             number += n
         }
-        
+
         return number;
     }
 
-    fetchEntries(category?: string, stage?: string, minR1Score?: number, maxR1Score?: number) {
+    fetchEntries(category?: string, stage?: string, minR1Score?: string, maxR1Score?: number, status?: string) {
 
         this.afs.collection('submissions', ref => {
             let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
             if (category) { query = query.where('category', '==', category) };
             if (stage) { query = query.where('stage', '==', stage) };
+            if (minR1Score) { query = query.where('r1Score', '>', parseInt(minR1Score)) };
+            if (status && status !== 'submitted') {
+                query = query.where('status', '==', status)
+            }
             return query;
         })
             .snapshotChanges()
@@ -45,7 +49,8 @@ export class DataService {
                         r2Score: doc.payload.doc.data().r2Score,
                         submissionId: doc.payload.doc.id,
                         userId: doc.payload.doc.data().userId,
-                        numericId: this.getNumberId(doc.payload.doc.id)
+                        numericId: this.getNumberId(doc.payload.doc.id),
+                        status: doc.payload.doc.data().status ? doc.payload.doc.data().status : 'submitted'
                     };
                 });
             })
@@ -75,7 +80,7 @@ export class DataService {
             })
     }
 
-    updateSubmission(submissionId: string, value: any){
+    updateSubmission(submissionId: string, value: any) {
         return this.afs.collection('submissions').doc(submissionId).update(value)
     }
 

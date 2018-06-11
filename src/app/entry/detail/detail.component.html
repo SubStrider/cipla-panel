@@ -40,9 +40,9 @@
                                     </div>
                                 </form>
                             </div>
-                           
+
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -63,7 +63,8 @@
                                 <div class="col-md-6">
                                     <div>
                                         <mat-form-field>
-                                            <mat-select placeholder="Revenue Potential (3rd Year)" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('revenuePotential', revenuePotential)" [disabled]="revenuePotential && !authService.canChangeScore(user)">
+                                            <mat-select placeholder="Revenue Potential (3rd Year)" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('revenuePotential', revenuePotential)"
+                                                [disabled]="revenuePotential && !authService.canChangeScore(user)">
                                                 <mat-option *ngFor="let val of revenuePotentialConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                                             </mat-select>
                                         </mat-form-field>
@@ -71,7 +72,8 @@
                                     <br>
                                     <div>
                                         <mat-form-field>
-                                            <mat-select placeholder="Synergy with Cipla" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('ciplaSynergy', ciplaSynergy)" [disabled]="ciplaSynergy && !authService.canChangeScore(user)">
+                                            <mat-select placeholder="Synergy with Cipla" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('ciplaSynergy', ciplaSynergy)"
+                                                [disabled]="ciplaSynergy && !authService.canChangeScore(user)">
                                                 <mat-option *ngFor="let val of ciplaSynergyConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                                             </mat-select>
                                         </mat-form-field>
@@ -80,7 +82,8 @@
                                 <div class="col-md-6">
                                     <div>
                                         <mat-form-field>
-                                            <mat-select placeholder="Implementability" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('implementability', implementability)" [disabled]="implementability && !authService.canChangeScore(user)">
+                                            <mat-select placeholder="Implementability" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('implementability', implementability)"
+                                                [disabled]="implementability && !authService.canChangeScore(user)">
                                                 <mat-option *ngFor="let val of implementabilityConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                                             </mat-select>
                                         </mat-form-field>
@@ -88,7 +91,8 @@
                                     <br>
                                     <div>
                                         <mat-form-field>
-                                            <mat-select placeholder="Uniqueness" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('uniqueness', uniqueness)" [disabled]="uniqueness && !authService.canChangeScore(user)">
+                                            <mat-select placeholder="Uniqueness" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('uniqueness', uniqueness)"
+                                                [disabled]="uniqueness && !authService.canChangeScore(user)">
                                                 <mat-option *ngFor="let val of uniquenessConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                                             </mat-select>
                                         </mat-form-field>
@@ -99,7 +103,8 @@
                                 <div class="col-md-12">
                                     <div class="text-primary">
                                         <h6>Comments</h6>
-                                        <textarea class="form-control" placeholder="Please enter some comments about this entry" rows="3" formControlName="judgeComments" [disabled]="submission.judgeEntry && submission.judgeEntry.judgeComments && !authService.canChangeScore(user)"></textarea>
+                                        <textarea class="form-control" placeholder="Please enter some comments about this entry" rows="3" formControlName="judgeComments"
+                                            [disabled]="submission.judgeEntry && submission.judgeEntry.judgeComments && !authService.canChangeScore(user)"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -118,12 +123,13 @@
             <div class="col-md-12">
                 <div class="card" id="submission">
                     <div class="card-header">
+                        
                         <h6 class="text-primary">Team Name</h6>
                         <h4 class="card-title">
                             <button class="btn btn-default pull-right hidden-print" (click)="downloadPDF()">
                                 Download PDF
                             </button>
-                            {{ submission.teamName || 'No Team Name'}}
+                            {{ submission.teamName || 'No Team Name'}} ({{numericId}})
                         </h4>
                     </div>
                     <div class="card-content">

@@ -27,6 +27,7 @@ export class DetailComponent implements OnInit, OnDestroy {
     showForm: boolean = false;
     judgeEntry: JudgeEntry;
     user: User;
+    numericId: string;
 
     // Error object
     error: any = {};
@@ -109,8 +110,9 @@ export class DetailComponent implements OnInit, OnDestroy {
             .doc(this.submissionId)
             .valueChanges()
 
+        this.numericId = this.dataService.getNumberId(this.submissionId)
+
         this.submissionSubscription = this.userSubmission.subscribe(data => {
-            console.log(data)
             if (data['preScreen']) {
                 this.health = data['preScreen'].health ? '1' : '0';
                 this.revenue = data['preScreen'].revenue ? '1' : '0';
@@ -193,11 +195,6 @@ export class DetailComponent implements OnInit, OnDestroy {
             this.loading['judgeEntry'] = false
             console.error("Transaction failed: ", error);
         });
-        // this.dataService.updateSubmission(this.submissionId)
-        //     .then( res => {
-        //         console.log("Transaction successfully committed!");
-        //     })
-        //     .catch(error => { console.error("Transaction failed: ", error); });
     };
 
     editJudgeEntry() {
