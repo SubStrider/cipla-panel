@@ -32,7 +32,7 @@ export class DataService {
             let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
             if (category) { query = query.where('category', '==', category) };
             if (stage) { query = query.where('stage', '==', stage) };
-            if (minR1Score) { query = query.where('r1Score', '>', parseInt(minR1Score)) };
+            if (minR1Score && minR1Score !== '0') { query = query.where('r1Score', '>', parseInt(minR1Score)) };
             if (status && status !== 'submitted') {
                 query = query.where('status', '==', status)
             }

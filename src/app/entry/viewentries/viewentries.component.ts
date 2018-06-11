@@ -74,7 +74,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
             this.selectedCategory = params['category']
             this.selectedStage = params['stage']
             this.selectedStatus = params['status']
-            this.minScore = params['min']
+            this.minScore = params['min'] || '0'
             this.dataService.fetchEntries(this.selectedCategory, this.selectedStage, this.minScore.toString(), null, this.selectedStatus);
         }, error => {
             console.error(error)
