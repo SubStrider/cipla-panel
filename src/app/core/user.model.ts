@@ -97,7 +97,8 @@ export interface UserTableData{
 
 export interface Criteria {
     criteriaName: string;
-    criteriaScore: number
+    criteriaScore: number;
+    criteriaCategory: string;
 }
 
 export interface JudgeEntry {

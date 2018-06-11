@@ -4,10 +4,13 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/mergeMap';
 import { ActivatedRoute } from '@angular/router';
 import printJS from 'print-js';
-import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import { Criteria, JudgeEntry, User } from '../../core/user.model';
 import { AuthService } from '../../core/auth.service';
 import { DataService } from '../../core/data.service';
+import * as _ from 'lodash';
+import { ISubscription } from 'rxjs/Subscription';
+import * as firebase from 'firebase/app';
 
 @Component({
     selector: 'app-detail',
@@ -16,12 +19,13 @@ import { DataService } from '../../core/data.service';
 })
 export class DetailComponent implements OnInit, OnDestroy {
     userSubmission: Observable<{}>;
+    submissionSubscription: ISubscription;
+    userSubscription: ISubscription;
     submissionId: string;
     judgeEntryForm: FormGroup;
     preScreenForm: FormGroup;
     showForm: boolean = false;
     judgeEntry: JudgeEntry;
-    judgeId: string;
     user: User;
 
     // Error object
@@ -30,34 +34,45 @@ export class DetailComponent implements OnInit, OnDestroy {
     // Loading object
     loading: any = { preScreen: false, judging: false };
 
-    //Pre Screen Variables for 2 way binding
+    // Pre Screen Variables for 2 way binding
     health: string;
     revenue: string;
 
-    revenuePotentialConst: Criteria[] = [
-        { criteriaName: 'Less than 1M$', criteriaScore: 1 },
-        { criteriaName: '1-5M$', criteriaScore: 2 },
-        { criteriaName: '5-10M$', criteriaScore: 3 },
-        { criteriaName: 'More than 10M$', criteriaScore: 4 }
+    // Post Screen Variables for 2 way binding
+    revenuePotential: number;
+    ciplaSynergy: number;
+    implementability: number;
+    uniqueness: number;
+    judgeComments: string;
+    judgeId: string;
+
+    // Score variable for 2 way binding
+    r1Score: number;
+
+    readonly revenuePotentialConst: Criteria[] = [
+        { criteriaName: 'Less than 1M$', criteriaScore: 25, criteriaCategory: 'revenuePotential' },
+        { criteriaName: '1-5M$', criteriaScore: 50, criteriaCategory: 'revenuePotential' },
+        { criteriaName: '5-10M$', criteriaScore: 75, criteriaCategory: 'revenuePotential' },
+        { criteriaName: 'More than 10M$', criteriaScore: 100, criteriaCategory: 'revenuePotential' }
     ];
 
-    ciplaSynergyConst: Criteria[] = [
-        { criteriaName: 'Yes', criteriaScore: 3 },
-        { criteriaName: 'Maybe', criteriaScore: 2 },
-        { criteriaName: 'No', criteriaScore: 1 },
+    readonly ciplaSynergyConst: Criteria[] = [
+        { criteriaName: 'Yes', criteriaScore: 100, criteriaCategory: 'ciplaSynergy' },
+        { criteriaName: 'Maybe', criteriaScore: 50, criteriaCategory: 'ciplaSynergy' },
+        { criteriaName: 'No', criteriaScore: 0, criteriaCategory: 'ciplaSynergy' },
     ];
 
-    implementabilityConst: Criteria[] = [
-        { criteriaName: 'Idea is realistic', criteriaScore: 3 },
-        { criteriaName: 'Idea seems less likely', criteriaScore: 2 },
-        { criteriaName: 'Challenging to execute', criteriaScore: 1 },
+    readonly implementabilityConst: Criteria[] = [
+        { criteriaName: 'Idea is realistic', criteriaScore: 100, criteriaCategory: 'implementability' },
+        { criteriaName: 'Idea seems less likely', criteriaScore: 50, criteriaCategory: 'implementability' },
+        { criteriaName: 'Challenging to execute', criteriaScore: 0, criteriaCategory: 'implementability' },
     ];
 
-    uniquenessConst: Criteria[] = [
-        { criteriaName: 'Idea is unique (nowhere implemented in the world)', criteriaScore: 3 },
-        { criteriaName: 'Idea is unique for India (implemented in developed markets)', criteriaScore: 3 },
-        { criteriaName: 'Idea is not unique however business model is streamlined and scalable', criteriaScore: 2 },
-        { criteriaName: 'Idea is not unique (many similar ideas exist in the market)', criteriaScore: 1 },
+    readonly uniquenessConst: Criteria[] = [
+        { criteriaName: 'Idea is unique', criteriaScore: 100, criteriaCategory: 'uniqueness' },
+        { criteriaName: 'Idea is unique for India', criteriaScore: 100, criteriaCategory: 'uniqueness' },
+        { criteriaName: 'Idea is not unique however business model is streamlined and scalable', criteriaScore: 50, criteriaCategory: 'uniqueness' },
+        { criteriaName: 'Idea is not unique', criteriaScore: 0, criteriaCategory: 'uniqueness' },
     ];
 
     constructor(
@@ -68,11 +83,12 @@ export class DetailComponent implements OnInit, OnDestroy {
         private dataService: DataService
     ) {
         this.judgeEntryForm = this.formBuilder.group({
-            revenuePotential: ['', Validators.required],
+            revenuePotential: ['', [Validators.required]],
             ciplaSynergy: ['', Validators.required],
             implementability: ['', Validators.required],
             uniqueness: ['', Validators.required],
-            judgeComments: ['', Validators.required]
+            judgeComments: '',
+            judgeUID: ['', Validators.required]
         });
 
         this.preScreenForm = this.formBuilder.group({
@@ -82,7 +98,6 @@ export class DetailComponent implements OnInit, OnDestroy {
     }
 
     changePreScreen(event) {
-        console.log(event)
         let value: any = {}
         value[event.source.name] = event.value === '1' ? true : false
         this.preScreenForm.patchValue(value)
@@ -94,52 +109,90 @@ export class DetailComponent implements OnInit, OnDestroy {
             .doc(this.submissionId)
             .valueChanges()
 
-        this.userSubmission.subscribe(data => {
+        this.submissionSubscription = this.userSubmission.subscribe(data => {
             console.log(data)
             if (data['preScreen']) {
                 this.health = data['preScreen'].health ? '1' : '0';
                 this.revenue = data['preScreen'].revenue ? '1' : '0';
                 this.preScreenForm.setValue({ health: this.health, revenue: this.revenue })
             }
+
+            if (data['judgeEntry']) {
+                this.revenuePotential = data['judgeEntry'].revenuePotential
+                this.ciplaSynergy = data['judgeEntry'].ciplaSynergy
+                this.implementability = data['judgeEntry'].implementability
+                this.uniqueness = data['judgeEntry'].uniqueness
+                this.judgeComments = data['judgeEntry'].judgeComments
+                this.judgeId = data['judgeEntry'].judgeUID
+                this.judgeEntryForm.setValue({
+                    revenuePotential: this.revenuePotential,
+                    ciplaSynergy: this.ciplaSynergy,
+                    implementability: this.implementability,
+                    uniqueness: this.uniqueness,
+                    judgeComments: this.judgeComments,
+                    judgeUID: this.judgeId
+                })
+                this.r1Score = data['r1Score']
+            }
         })
 
-        this.authService.user$.subscribe(data => {
+        this.userSubscription = this.authService.user$.subscribe(data => {
             this.user = data
-            this.judgeId = data.uid;
+            if (!(this.judgeEntryForm.value && this.judgeEntryForm.value.judgeUID)) {
+                this.judgeId = data.uid;
+                this.judgeEntryForm.patchValue({ judgeUID: data.uid })
+            }
         });
     }
 
     ngOnDestroy() {
+        this.submissionSubscription.unsubscribe()
+        this.userSubscription.unsubscribe()
     };
 
+    calculateScore(scoreObject): number {
+        let score = 0;
+        _.map(scoreObject, (value, key) => {
+            if (_.isNumber(value)) {
+                score += 0.25 * value
+            }
+        })
+
+        score = score / 20;
+
+        return parseFloat(score.toFixed(2))
+    }
+
+    public findAndRetrieve(category, score): any{
+        if(category === 'revenuePotential'){
+            return _.find(this.revenuePotentialConst, {criteriaScore: score})
+        }
+        else if(category === 'implementability'){
+            return _.find(this.implementabilityConst, {criteriaScore: score})
+        }
+        else if(category === 'uniqueness'){
+            return _.find(this.uniquenessConst, {criteriaScore: score})
+        }
+        else if(category === 'ciplaSynergy'){
+            return _.find(this.ciplaSynergyConst, {criteriaScore: score})
+        }
+    }
+
     saveJudgeEntry() {
-        this.judgeEntry = {
-            revPotential: this.judgeEntryForm.value.radioRev,
-            healthcare: this.judgeEntryForm.value.radioHealth,
-            revenuePotential3rd: {
-                criteriaName: this.judgeEntryForm.value.revenuePotential,
-                criteriaScore: this.revenuePotentialConst
-                    .find(x => x.criteriaName === this.judgeEntryForm.value.revenuePotential).criteriaScore
-            },
-            implementability: {
-                criteriaName: this.judgeEntryForm.value.implementability,
-                criteriaScore: this.implementabilityConst
-                    .find(x => x.criteriaName === this.judgeEntryForm.value.implementability).criteriaScore
-            },
-            synergy: {
-                criteriaName: this.judgeEntryForm.value.ciplaSynergy,
-                criteriaScore: this.ciplaSynergyConst
-                    .find(x => x.criteriaName === this.judgeEntryForm.value.ciplaSynergy).criteriaScore
-            },
-            uniqueness: {
-                criteriaName: this.judgeEntryForm.value.uniqueness,
-                criteriaScore: this.uniquenessConst
-                    .find(x => x.criteriaName === this.judgeEntryForm.value.uniqueness).criteriaScore
-            },
-            judgeUID: this.judgeId,
-            comments: this.judgeEntryForm.value.judgeComments,
-        };
-        console.log(this.judgeEntry);
+        this.loading['judgeEntry'] = true
+        console.log(this.judgeEntryForm.value)
+        let value = { judgeEntry: this.judgeEntryForm.value, r1Score: this.calculateScore(this.judgeEntryForm.value), status:'scored' }
+        this.r1Score = value['r1Score']
+        console.log(value)
+        this.dataService.updateSubmission(this.submissionId, value)
+        .then(res => {
+            this.loading['judgeEntry'] = false
+            console.log("Transaction successfully committed!");
+        })
+        .catch(error => {
+            this.loading['judgeEntry'] = false
+            console.error("Transaction failed: ", error);
+        });
         // this.dataService.updateSubmission(this.submissionId)
         //     .then( res => {
         //         console.log("Transaction successfully committed!");
@@ -172,12 +225,15 @@ export class DetailComponent implements OnInit, OnDestroy {
         this.loading['preScreen'] = true
         let preScreen = this.preScreenForm.value
         let status: string = null;
+        let val: any = {}
         if (preScreen.health && preScreen.revenue) {
-            status = 'approved'
+            status = 'approved',
+            val = { preScreen: preScreen, status: status }
         } else {
             status = 'rejected'
+            val = { preScreen: preScreen, status: status, r1Score: firebase.firestore.FieldValue.delete(), judgeEntry: firebase.firestore.FieldValue.delete()}
         }
-        this.dataService.updateSubmission(this.submissionId, { preScreen: preScreen, status: status })
+        this.dataService.updateSubmission(this.submissionId, val)
             .then(res => {
                 this.loading['preScreen'] = false
                 console.log("Transaction successfully committed!");
@@ -187,6 +243,12 @@ export class DetailComponent implements OnInit, OnDestroy {
                 console.error("Transaction failed: ", error);
             });
 
+    }
+
+    selectOption(event) {
+        let value: any = {}
+        value[event.value.criteriaCategory] = event.value.criteriaScore
+        this.judgeEntryForm.patchValue(value)
     }
 
 }

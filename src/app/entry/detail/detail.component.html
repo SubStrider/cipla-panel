@@ -2,10 +2,12 @@
     <div class="container-fluid" *ngIf="userSubmission | async as submission">
         <div class="row">
             <div class="col-md-12">
-                <div class="card">
-                    <!-- <form [formGroup]="judgeEntryForm"> -->
+                <div class="card" *ngIf="authService.canJudge(user)">
                     <div class="card-header">
-                        <h4 class="card-title">Pre Screening</h4>
+                        <h4 class="card-title">
+                            Pre Screening
+                            <span class="badge badge-success" *ngIf="submission.preScreen">Done</span>
+                        </h4>
                     </div>
                     <div class="card-content">
                         <div class="row">
@@ -15,7 +17,8 @@
                                         <div class="col-xs-12 col-md-6">
                                             <div class="form-group">
                                                 <label>Is this a healthcare idea?</label>
-                                                <mat-radio-group (change)="changePreScreen($event)" [name]="'health'" [required]="true" [disabled]="health && !authService.canChangeScore(user)" [value]="health">
+                                                <mat-radio-group (change)="changePreScreen($event)" [name]="'health'" [required]="true" [disabled]="health && !authService.canChangeScore(user)"
+                                                    [value]="health">
                                                     <mat-radio-button value="1">Yes</mat-radio-button>
                                                     <mat-radio-button value="0">No</mat-radio-button>
                                                 </mat-radio-group>
@@ -24,145 +27,91 @@
                                         <div class="col-xs-12 col-md-6">
                                             <div class="form-group">
                                                 <label>Does this idea have a revenue potential?</label>
-                                                <mat-radio-group (change)="changePreScreen($event)" [name]="'revenue'" [required]="true" [disabled]="revenue && !authService.canChangeScore(user)" [value]="revenue">
+                                                <mat-radio-group (change)="changePreScreen($event)" [name]="'revenue'" [required]="true" [disabled]="revenue && !authService.canChangeScore(user)"
+                                                    [value]="revenue">
                                                     <mat-radio-button value="1">Yes</mat-radio-button>
                                                     <mat-radio-button value="0">No</mat-radio-button>
                                                 </mat-radio-group>
                                             </div>
                                         </div>
                                         <div class="col-xs-12" *ngIf="!submission.preScreen || authService.canChangeScore(user)">
-                                            <button type="submit" class="btn btn-default float-right" [disabled]="!preScreenForm.valid || loading.preScreen" *ngIf="authService.canJudge(user)">{{loading.preScreen ? 'Saving...' : 'Save Prescreening'}}</button>
+                                            <button type="submit" class="btn btn-default" [disabled]="!preScreenForm.valid || loading.preScreen" *ngIf="authService.canJudge(user)">{{loading.preScreen ? 'Saving...' : 'Save Prescreening'}}</button>
                                         </div>
                                     </div>
                                 </form>
                             </div>
-                            <!-- <div class="col-md-6">
-                                <div class="text-primary">
-                                    <h6>Revenue Potential in 3rd Year</h6>
-                                </div>
-                                <div>
-                                    <select name="revenue_potential" class="form-control" formControlName="revenuePotential">
-                                        <option selected="" disabled="">- select one -</option>
-                                        <option *ngFor="let val of revenuePotentialConst" [value]="val.criteriaName">{{val.criteriaName}}</option>
-                                    </select>
-                                </div>
-                                <div class="text-primary">
-                                    <h6>Synergy with Cipla</h6>
-                                </div>
-                                <div>
-                                    <select name="cipla_synergy" class="form-control" formControlName="ciplaSynergy">
-                                        <option selected="" disabled="">- select one -</option>
-                                        <option *ngFor="let val of ciplaSynergyConst" [value]="val.criteriaName">{{val.criteriaName}}</option>
-
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="text-primary">
-                                    <h6>Implementability of the Idea</h6>
-                                </div>
-                                <div>
-                                    <select name="implementability" class="form-control" formControlName="implementability">
-                                        <option selected="" disabled="">- select one -</option>
-                                        <option *ngFor="let val of implementabilityConst" [value]="val.criteriaName">{{val.criteriaName}}</option>
-                                    </select>
-                                </div>
-                                <div class="text-primary">
-                                    <h6>Uniqueness</h6>
-                                </div>
-                                <div>
-                                    <select name="uniqueness" class="form-control" formControlName="uniqueness">
-                                        <option selected="" disabled="">- select one -</option>
-                                        <option *ngFor="let val of uniquenessConst" [value]="val.criteriaName">{{val.criteriaName}}</option>
-                                    </select>
-                                </div>
-                            </div> -->
+                           
                         </div>
-                        <!-- <div class="row">
-                            <div class="col-md-12">
-                                <div class="text-primary">
-                                    <h6>Comments</h6>
-                                </div>
-                                <textarea class="form-control" placeholder="Please enter some comments about this entry" rows="3" formControlName="judgeComments"></textarea>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <button class="btn btn-primary btn-fill btn-wd" [disabled]="judgeEntryForm.invalid" (click)="saveJudgeEntry()">Submit</button>
-                                <button class="btn btn-wd" (click)="cancelJudgeEntry()">Cancel</button>
-                            </div>
-                        </div> -->
+                        
                     </div>
-                    <!-- </form> -->
                 </div>
-                <div class="card" *ngIf="submission.judgeEntry && !showForm">
-                    <div class="card-header">
-                        <h4 class="card-title">Your Rating</h4>
-                    </div>
-                    <div class="card-content">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div>
-                                    <div class="text-primary">
-                                        <h6>Healthcare Idea</h6>
-                                    </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="submission.preScreen && submission.status && authService.canJudge(user) && submission.status !== 'rejected'">
+            <div class="col-xs-12 col-md-12">
+                <form [formGroup]="judgeEntryForm" (ngSubmit)="saveJudgeEntry()">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Rating:
+                                <span class="label" [ngClass]="{'label-danger': r1Score < 3, 'label-warning': r1Score >= 3 && r1Score < 4, 'label-success': r1Score >= 4}">
+                                    {{r1Score || 0}}
+                                </span>
+                            </h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col-md-6">
                                     <div>
-                                        <p>{{ submission.judgeEntry.healthcare.valueOf() }}</p>
+                                        <mat-form-field>
+                                            <mat-select placeholder="Revenue Potential (3rd Year)" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('revenuePotential', revenuePotential)" [disabled]="revenuePotential && !authService.canChangeScore(user)">
+                                                <mat-option *ngFor="let val of revenuePotentialConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                    <br>
+                                    <div>
+                                        <mat-form-field>
+                                            <mat-select placeholder="Synergy with Cipla" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('ciplaSynergy', ciplaSynergy)" [disabled]="ciplaSynergy && !authService.canChangeScore(user)">
+                                                <mat-option *ngFor="let val of ciplaSynergyConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
                                     </div>
                                 </div>
-                                <div class="text-primary">
-                                    <h6>Revenue Potential</h6>
-                                </div>
-                                <div>
-                                    <p>{{ submission.judgeEntry.revPotential.valueOf() }}</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="text-primary">
-                                    <h6>Revenue Potential in 3rd Year</h6>
-                                </div>
-                                <div>
-                                    <p>{{ submission.judgeEntry.revenuePotential3rd.criteriaName }}</p>
-                                </div>
-                                <div class="text-primary">
-                                    <h6>Synergy with Cipla</h6>
-                                </div>
-                                <div>
-                                    <p>{{ submission.judgeEntry.synergy.criteriaName }}</p>
+                                <div class="col-md-6">
+                                    <div>
+                                        <mat-form-field>
+                                            <mat-select placeholder="Implementability" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('implementability', implementability)" [disabled]="implementability && !authService.canChangeScore(user)">
+                                                <mat-option *ngFor="let val of implementabilityConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
+                                    <br>
+                                    <div>
+                                        <mat-form-field>
+                                            <mat-select placeholder="Uniqueness" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('uniqueness', uniqueness)" [disabled]="uniqueness && !authService.canChangeScore(user)">
+                                                <mat-option *ngFor="let val of uniquenessConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
+                                            </mat-select>
+                                        </mat-form-field>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="text-primary">
-                                    <h6>Implementability of the Idea</h6>
-                                </div>
-                                <div>
-                                    <p>{{ submission.judgeEntry.implementability.criteriaName }}</p>
-                                </div>
-                                <div class="text-primary">
-                                    <h6>Uniqueness</h6>
-                                </div>
-                                <div>
-                                    <p>{{ submission.judgeEntry.uniqueness.criteriaName }}</p>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="text-primary">
+                                        <h6>Comments</h6>
+                                        <textarea class="form-control" placeholder="Please enter some comments about this entry" rows="3" formControlName="judgeComments" [disabled]="submission.judgeEntry && submission.judgeEntry.judgeComments && !authService.canChangeScore(user)"></textarea>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="text-primary">
-                                    <h6>Comments</h6>
+                            <div class="row">
+                                <div class="col-md-12" *ngIf="!submission.judgeEntry || authService.canChangeScore(user)">
+                                    <br>
+                                    <button type="submit" class="btn btn-primary btn-fill btn-wd" [disabled]="!judgeEntryForm.valid || loading.judgeEntry" *ngIf="authService.canJudge(user)">{{loading.judgeEntry ? 'Saving...' : 'Save Score'}}</button>
                                 </div>
-                                <div>
-                                    <p>{{ submission.judgeEntry.comments }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <button class="btn btn-primary btn-fill btn-wd" (click)="editJudgeEntry()">Edit</button>
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
         <div class="row">
