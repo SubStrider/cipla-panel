@@ -81,7 +81,7 @@
                         <p class="description">Judged</p>
                     </div>
                     <div class="card-content">
-                        <div id="chartOrders" class="chart-circle" data-percent="0">0%</div>
+                        <div id="chartOrders" class="chart-circle" [attr.data-percent]="judged | percent">{{judged | percent}}</div>
                     </div>
                 </div>
             </div>

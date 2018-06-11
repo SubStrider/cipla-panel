@@ -94,3 +94,22 @@ export interface UserTableData{
     uid: string;
     phone: string;
 }
+
+export interface Criteria {
+    criteriaName: string;
+    criteriaScore: number;
+    criteriaCategory: string;
+}
+
+export interface JudgeEntry {
+    revenuePotential3rd: Criteria;
+    implementability: Criteria;
+    synergy: Criteria;
+    uniqueness: Criteria;
+    judgeUID: string;
+    comments: string;
+    revPotential: boolean;
+    healthcare: boolean;
+}
+
+
