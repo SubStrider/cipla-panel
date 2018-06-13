@@ -45,7 +45,19 @@ export class DataService {
                         r2Score: doc.payload.doc.data().r2Score,
                         submissionId: doc.payload.doc.id,
                         userId: doc.payload.doc.data().userId,
-                        numericId: this.getNumberId(doc.payload.doc.id)
+                        numericId: this.getNumberId(doc.payload.doc.id),
+                        pitch: doc.payload.doc.data().pitch,
+                        overview: doc.payload.doc.data().overview,
+                        potential: doc.payload.doc.data().potential,
+                        market: doc.payload.doc.data().market,
+                        competition: doc.payload.doc.data().competition,
+                        teamSize: doc.payload.doc.data().teamSize,
+                        // members:doc.payload.doc.data().members,
+                        revenue: doc.payload.doc.data().revenue,
+                        year:doc.payload.doc.data().year,
+                        website: doc.payload.doc.data().website,
+                        partner: doc.payload.doc.data().partner,
+                        attachment: doc.payload.doc.data().attachment
                     };
                 });
             })
