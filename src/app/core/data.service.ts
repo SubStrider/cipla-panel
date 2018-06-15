@@ -26,7 +26,7 @@ export class DataService {
         return number;
     }
 
-    fetchEntries(category?: string, stage?: string, minR1Score?: string, maxR1Score?: number, status?: string) {
+    fetchEntries(category?: string, stage?: string, minR1Score?: string, maxR1Score?: number, status?: string, judgeId?: any) {
 
         this.afs.collection('submissions', ref => {
             let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;

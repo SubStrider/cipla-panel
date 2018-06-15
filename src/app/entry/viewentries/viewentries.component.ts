@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import * as firebase from 'firebase/app';
+import * as _ from 'lodash';
 
 declare var $: any;
 
@@ -32,7 +33,7 @@ declare interface DataTable {
 
 export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     // dataRows: Observable<EntryTableData[]>;
-    displayedColumns = ['numericId', 'teamName', 'category', 'stage', 'status', 'r1Score', 'r2Score', 'actions','assign'];
+    displayedColumns = ['select', 'teamName', 'category', 'stage', 'status', 'r1Score', 'r2Score', 'assignedTo', 'actions'];
     dataSource = new MatTableDataSource<EntryTableData>();
     dataDetail: EntryTableData[];
     private entriesSubscription: Subscription;
@@ -152,24 +153,32 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.router.navigate(['/a/entry/viewentries'], { queryParams: { category: category.value }, queryParamsHandling: 'merge' })
     }
 
-    assignJudge(submission) {
-        if (submission['judges'] && submission['judges'].length) {
-            submission.loading = true
-            this.dataService.updateSubmission(submission.submissionId, { judges: submission.judges.join('|') }).then(r => {
-                console.log(`${submission.submissionId} updated`)
-                submission.loading = false;
+    assignJudges() {
+        console.log(this.selection.selected)
+        if(this.selectedJudges && this.selectedJudges.length){
+            this.selection.selected.forEach(submission => {
+                this.dataSource
+                this.dataService.updateSubmission(submission.submissionId, {judges: this.selectedJudges.join('|')}).then(res => {
+                    console.log(res)
+                }).catch(err => {console.error(err)})
             })
         } else {
-            submission.loading = true
-            this.dataService.updateSubmission(submission.submissionId, { judges: firebase.firestore.FieldValue.delete() }).then(r => {
-                console.log(`${submission.submissionId} updated`)
-                submission.loading = false;
-            })
+            window.alert('Please select judges first')
         }
     }
 
-    selectJudges(event, element) {
-        element['judges'] = event.value;
+    selectJudges(event){
+        this.selectedJudges = event.value
+    }
+
+    removeJudges(submission) {
+        submission.loading = true
+        this.dataService.updateSubmission(submission.submissionId, { judges: firebase.firestore.FieldValue.delete() }).then(r => {
+            console.log(`${submission.submissionId} updated`)
+            submission.loading = false;
+        })
+
+        this.dataService.fetchEntries(this.selectedCategory, this.selectedStage, this.minScore.toString(), null, this.selectedStatus);
     }
 
     selectStage(stage) {
@@ -222,5 +231,9 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
         this.isAllSelected() ?
             this.selection.clear() :
             this.dataSource.data.forEach(row => this.selection.select(row));
+    }
+
+    getJudgeName(uid) {
+        return _.find(this.judges, { uid: uid }).name
     }
 }
