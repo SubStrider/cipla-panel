@@ -72,7 +72,7 @@ export class DetailComponent implements OnInit, OnDestroy {
     readonly uniquenessConst: Criteria[] = [
         { criteriaName: 'Idea is unique', criteriaScore: 100, criteriaCategory: 'uniqueness' },
         { criteriaName: 'Idea is unique for India', criteriaScore: 100, criteriaCategory: 'uniqueness' },
-        { criteriaName: 'Idea is not unique however business model is streamlined and scalable', criteriaScore: 50, criteriaCategory: 'uniqueness' },
+        { criteriaName: 'Idea is not unique, business model is unique', criteriaScore: 50, criteriaCategory: 'uniqueness' },
         { criteriaName: 'Idea is not unique', criteriaScore: 0, criteriaCategory: 'uniqueness' },
     ];
 

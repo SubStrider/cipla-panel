@@ -42,19 +42,21 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
 
         this.userSubscription = this.authService.user$.subscribe(user => {
             this.user = user
-            // if(user.roles.admin && !this.displayedColumns.includes['roles']){
-            //     this.displayedColumns.splice(2, 0, 'roles')
-            // }
         })
     }
 
     doFilter(filterValue: string) {
-        this.dataSource.filter = filterValue.trim().toLowerCase();
+        if(filterValue && filterValue.length >= 3){
+            this.dataSource.filter = filterValue.trim().toLowerCase();
+        } else {
+            this.dataSource.filter = null;
+        }
     }
 
     ngOnDestroy(){
         this.usersSubscription.unsubscribe();
         this.userSubscription.unsubscribe();
+        this.dataSource.disconnect();
     }
 
     ngAfterViewInit(){

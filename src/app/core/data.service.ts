@@ -58,11 +58,12 @@ export class DataService {
                         teamSize: doc.payload.doc.data().teamSize,
                         // members:doc.payload.doc.data().members,
                         revenue: doc.payload.doc.data().revenue,
-                        year:doc.payload.doc.data().year,
+                        year: doc.payload.doc.data().year,
                         website: doc.payload.doc.data().website,
                         partner: doc.payload.doc.data().partner,
                         attachment: doc.payload.doc.data().attachment,
-                        status: doc.payload.doc.data().status ? doc.payload.doc.data().status : 'submitted'
+                        status: doc.payload.doc.data().status ? doc.payload.doc.data().status : 'submitted',
+                        judges: doc.payload.doc.data().judges ? doc.payload.doc.data().judges.split('|') : null
                     };
                 });
             })
@@ -72,8 +73,13 @@ export class DataService {
     }
 
 
-    getUsers() {
-        this.afs.collection('users')
+    getUsers(isJudge?: boolean, isSuperJudge?: boolean) {
+        this.afs.collection('users', ref => {
+            let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
+            if (isJudge) { query = query.where('roles.judge', '==', true) }
+            if (isSuperJudge) { query = query.where('roles.superjudge', '==', true) }
+            return query;
+        })
             .snapshotChanges()
             .map(userArray => {
                 return userArray.map(user => {

@@ -52,7 +52,7 @@
                 <form [formGroup]="judgeEntryForm" (ngSubmit)="saveJudgeEntry()">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Rating:
+                            <h4 class="card-title">Screening:
                                 <span class="label" [ngClass]="{'label-danger': r1Score < 3, 'label-warning': r1Score >= 3 && r1Score < 4, 'label-success': r1Score >= 4}">
                                     {{r1Score || 0}}
                                 </span>
@@ -62,8 +62,9 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div>
+                                        <label>3rd year revenue potential</label>
                                         <mat-form-field>
-                                            <mat-select placeholder="Revenue Potential (3rd Year)" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('revenuePotential', revenuePotential)"
+                                            <mat-select placeholder="Pick one" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('revenuePotential', revenuePotential)"
                                                 [disabled]="revenuePotential && !authService.canChangeScore(user)">
                                                 <mat-option *ngFor="let val of revenuePotentialConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                                             </mat-select>
@@ -71,8 +72,9 @@
                                     </div>
                                     <br>
                                     <div>
+                                        <label>Synergy with Cipla</label>
                                         <mat-form-field>
-                                            <mat-select placeholder="Synergy with Cipla" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('ciplaSynergy', ciplaSynergy)"
+                                            <mat-select placeholder="Pick one" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('ciplaSynergy', ciplaSynergy)"
                                                 [disabled]="ciplaSynergy && !authService.canChangeScore(user)">
                                                 <mat-option *ngFor="let val of ciplaSynergyConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                                             </mat-select>
@@ -81,8 +83,9 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div>
+                                        <label>Easy of Implementation</label>
                                         <mat-form-field>
-                                            <mat-select placeholder="Implementability" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('implementability', implementability)"
+                                            <mat-select placeholder="Pick one" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('implementability', implementability)"
                                                 [disabled]="implementability && !authService.canChangeScore(user)">
                                                 <mat-option *ngFor="let val of implementabilityConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                                             </mat-select>
@@ -90,8 +93,9 @@
                                     </div>
                                     <br>
                                     <div>
+                                        <label>Uniqueness</label>
                                         <mat-form-field>
-                                            <mat-select placeholder="Uniqueness" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('uniqueness', uniqueness)"
+                                            <mat-select placeholder="Pick one" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('uniqueness', uniqueness)"
                                                 [disabled]="uniqueness && !authService.canChangeScore(user)">
                                                 <mat-option *ngFor="let val of uniquenessConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                                             </mat-select>
@@ -105,6 +109,17 @@
                                         <h6>Comments</h6>
                                         <textarea class="form-control" placeholder="Please enter some comments about this entry" rows="3" formControlName="judgeComments"
                                             [disabled]="submission.judgeEntry && submission.judgeEntry.judgeComments && !authService.canChangeScore(user)"></textarea>
+                                    </div>
+                                    <br>
+                                    <div class="alert btn-success">
+                                        <h6>Guidelines</h6>
+                                        <p class="small">Synergy with Cipla: Ideas in the following categories are in synergy with Cipla:
+                                            Patient centricity, AI, POC Diagnostics, Remote monitoring diagnostic devices,
+                                            therapy specific medical devices, telehealth, pharmacy/doctor discovery, integrated
+                                            platforms, Drugopedia, Digital healthcare platforms</p>
+                                        <p class="small">Implementability: For revenue/POC stage startup, rate on team strength. Additional
+                                            criteria could be funding raised, sector expertise, premium educational background.
+                                            For ideation start-ups, rate on ease of implementation</p>
                                     </div>
                                 </div>
                             </div>
@@ -123,7 +138,7 @@
             <div class="col-md-12">
                 <div class="card" id="submission">
                     <div class="card-header">
-                        
+
                         <h6 class="text-primary">Team Name</h6>
                         <h4 class="card-title">
                             <button class="btn btn-default pull-right hidden-print" (click)="downloadPDF()">

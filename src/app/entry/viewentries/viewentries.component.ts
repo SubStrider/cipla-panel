@@ -3,15 +3,21 @@ import { AngularFirestore } from 'angularfire2/firestore';
 import { DataService } from '../../core/data.service';
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
-import { EntryTableData } from '../../core/user.model';
+import { EntryTableData, User } from '../../core/user.model';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
-import { Subscription } from 'rxjs/Subscription';
+import { Subscription, ISubscription } from 'rxjs/Subscription';
 import { AngularFirestoreDocument } from 'angularfire2/firestore';
 import { PapaParseService } from 'ngx-papaparse';
 import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
+import { AuthService } from '../../core/auth.service';
+import { SelectionModel } from '@angular/cdk/collections';
+import * as firebase from 'firebase/app';
 
 declare var $: any;
+
+const initialSelection = [];
+const allowMultiSelect = true;
 
 declare interface DataTable {
     headerRow: string[];
@@ -26,14 +32,19 @@ declare interface DataTable {
 
 export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     // dataRows: Observable<EntryTableData[]>;
-    displayedColumns = ['numericId', 'teamName', 'category', 'stage', 'status', 'r1Score', 'r2Score', 'actions'];
+    displayedColumns = ['numericId', 'teamName', 'category', 'stage', 'status', 'r1Score', 'r2Score', 'actions','assign'];
     dataSource = new MatTableDataSource<EntryTableData>();
     dataDetail: EntryTableData[];
     private entriesSubscription: Subscription;
     private emailSubscriptions: Subscription;
+    private judgesSubscription: Subscription;
+    userSubscription: ISubscription;
     categories: string[] = ['pharmaceutical', 'medical', 'devices', 'hospital', 'services', 'digital', 'diagnostics'];
     stages: string[] = ['ideation', 'poc', 'revenues'];
-    statuses: string[] = ['submitted','approved', 'rejected', 'scored'];
+    statuses: string[] = ['submitted', 'approved', 'rejected', 'scored'];
+    judges: any[] = [];
+    user: User;
+    loading: boolean;
 
     @ViewChild(MatSort) sort: MatSort;
     @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -43,18 +54,35 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     selectedFilter: string;
     selectedStatus: string;
     minScore: number;
+    selectedJudges: string[];
+
+    // For Selection
+    public selection = new SelectionModel<EntryTableData>(allowMultiSelect, initialSelection);
 
     constructor(
         private afs: AngularFirestore,
         private dataService: DataService,
         private papa: PapaParseService,
         private activatedRoute: ActivatedRoute,
-        private router: Router
+        private router: Router,
+        public authService: AuthService
     ) { }
 
     public dataTable: DataTable;
 
     ngOnInit() {
+
+        this.userSubscription = this.authService.user$.subscribe(data => {
+            this.user = data
+        });
+
+        this.judgesSubscription = this.dataService.usersChanged.subscribe((users: any[]) => {
+            console.log(users);
+            this.judges = users;
+        })
+
+        this.dataService.getUsers(true);
+
         this.entriesSubscription = this.dataService.entriesChanged.subscribe((entries: EntryTableData[]) => {
 
             entries.forEach((entry, index) => {
@@ -107,7 +135,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     doFilter(filterValue?: string) {
-        if (filterValue && filterValue.length) {
+        if (filterValue && filterValue.length >= 3) {
             this.dataSource.filter = filterValue.trim().toLowerCase();
         } else {
             this.dataSource.filter = null
@@ -117,10 +145,31 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnDestroy() {
         this.entriesSubscription.unsubscribe();
         this.emailSubscriptions.unsubscribe();
+        this.dataSource.disconnect();
     }
 
     selectCategory(category) {
         this.router.navigate(['/a/entry/viewentries'], { queryParams: { category: category.value }, queryParamsHandling: 'merge' })
+    }
+
+    assignJudge(submission) {
+        if (submission['judges'] && submission['judges'].length) {
+            submission.loading = true
+            this.dataService.updateSubmission(submission.submissionId, { judges: submission.judges.join('|') }).then(r => {
+                console.log(`${submission.submissionId} updated`)
+                submission.loading = false;
+            })
+        } else {
+            submission.loading = true
+            this.dataService.updateSubmission(submission.submissionId, { judges: firebase.firestore.FieldValue.delete() }).then(r => {
+                console.log(`${submission.submissionId} updated`)
+                submission.loading = false;
+            })
+        }
+    }
+
+    selectJudges(event, element) {
+        element['judges'] = event.value;
     }
 
     selectStage(stage) {
@@ -128,7 +177,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     selectStatus(status) {
-        if(status.value !== 'submitted'){
+        if (status.value !== 'submitted') {
             this.router.navigate(['/a/entry/viewentries'], { queryParams: { status: status.value }, queryParamsHandling: 'merge' })
         } else {
             this.router.navigate(['/a/entry/viewentries'], { queryParams: { status: null }, queryParamsHandling: 'merge' })
@@ -136,7 +185,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     selectMinScore(score) {
-        if(score.value > 0){
+        if (score.value > 0) {
             this.router.navigate(['/a/entry/viewentries'], { queryParams: { min: score.value }, queryParamsHandling: 'merge' })
         } else {
             this.router.navigate(['/a/entry/viewentries'], { queryParams: { min: null }, queryParamsHandling: 'merge' })
@@ -159,5 +208,19 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     scrollTop() {
         $('.main-panel').scrollTop(0)
+    }
+
+    /** Whether the number of selected elements matches the total number of rows. */
+    isAllSelected() {
+        const numSelected = this.selection.selected.length;
+        const numRows = this.dataSource.data.length;
+        return numSelected == numRows;
+    }
+
+    /** Selects all rows if they are not all selected; otherwise clear selection. */
+    masterToggle() {
+        this.isAllSelected() ?
+            this.selection.clear() :
+            this.dataSource.data.forEach(row => this.selection.select(row));
     }
 }
