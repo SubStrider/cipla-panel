@@ -13,7 +13,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "predeploy": "ng build --prod --aot",
-    "deploy": "s3-deploy './dist/**' --cwd './dist' --region ap-south-1 --bucket innoventure.socheers.net --signatureVersion v4 --profile socheers --cache 86400 --gzip"
+    "deploy": "firebase deploy"
   },
   "private": true,
   "dependencies": {
