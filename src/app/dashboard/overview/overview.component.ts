@@ -25,6 +25,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     judged: number = 0;
     userSubscription: ISubscription;
     statsSubscription: ISubscription;
+    emailSubscriptions: ISubscription[] = [];
 
     catCount: any[] = [
         { name: 'pharmaceutical', count: 0 },
@@ -195,15 +196,17 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     checkArrayAndUpdate(arr: any[], name: string) {
+        let other:any = {name: 'other'}
         if (name) {
-            let found = _.find(arr, { name: name })
+            let obj:any = {name:name}
+            let found = _.find(arr,  obj)
             if (found) {
-                _.find(arr, { name: name })['count'] += 1;
+                _.find(arr, obj)['count'] += 1;
             } else {
-                _.find(arr, { name: 'other' })['count'] += 1;
+                _.find(arr, other)['count'] += 1;
             }
         } else {
-            _.find(arr, { name: 'other' })['count'] += 1;
+            _.find(arr, other)['count'] += 1;
         }
     }
 
@@ -216,7 +219,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 })
             })
             .subscribe(result => {
-
+                this.userSubscription.unsubscribe()
 
                 this.count = { total: 0, cipla: 0 };
                 this.count['total'] = result.length
@@ -261,6 +264,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 });
             })
             .subscribe(result => {
+                this.statsSubscription.unsubscribe()
                 this.reset()
                 let weekCount = []
                 let countries = []
@@ -274,7 +278,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.checkArrayAndUpdate(this.catCount, value.category)
                     this.checkArrayAndUpdate(this.stageCount, value.stage || 'ideation')
 
-                    if(value.status){
+                    if(value.status ==='scored'){
                         judged++
                     }
 
@@ -284,22 +288,28 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                         date: value.createdAt || moment('2018-05-24').toDate()
                     })
 
-                    this.afs.collection('users')
-                        .doc(value.userID).valueChanges()
-                        .subscribe(res => {
-                            if (res && res['email'] && res['email'].includes('@cipla.com')) {
-                                this.totCiplaR1++;
-                            }
-                            if(res && res['country']){
-                                if(res['country'].toLowerCase().includes('india')){
-                                    this.addCountry('india')
-                                } else {
-                                    this.addCountry('overseas')
-                                }
-                            } else {
+                    this.dataService.getEmail(value.userID).then(res => {
+                        if (res && res['email'] && res['email'].includes('@cipla.com')) {
+                            this.totCiplaR1++;
+                        }
+                        if(res && res['country']){
+                            if(res['country'].toLowerCase().includes('india')){
                                 this.addCountry('india')
+                            } else {
+                                this.addCountry('overseas')
                             }
-                        });
+                        } else {
+                            this.addCountry('india')
+                        }
+                    })
+
+                    // let emailSubscription = this.afs.collection('users')
+                    //     .doc(value.userID).valueChanges()
+                    //     .subscribe(res => {
+                            
+                    //     });
+                    
+                    // this.emailSubscriptions.push(emailSubscription)
                 });
 
                 let weekData = _.chain(weekCount).sortBy('weekNumber').groupBy('weekNumber').value()
@@ -326,6 +336,9 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnDestroy() {
         this.userSubscription.unsubscribe();
         this.statsSubscription.unsubscribe();
+        // this.emailSubscriptions.forEach(subscription => {
+        //     subscription.unsubscribe();
+        // })
     }
 
 }

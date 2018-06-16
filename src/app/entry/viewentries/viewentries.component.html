@@ -141,9 +141,8 @@
                             <ng-container matColumnDef="assignedTo">
                                 <mat-header-cell *matHeaderCellDef>Assigned to</mat-header-cell>
                                 <mat-cell *matCellDef="let element">
-                                    <div *ngIf="element.judge1">{{getJudgeName(element.judge1) | titlecase}},</div>
-                                    <div *ngIf="element.judge2">{{getJudgeName(element.judge2) | titlecase}}</div> 
-                                    <button class="btn btn-danger btn-xs" (click)="removeJudges(element)" *ngIf="element.judge1 && element.judge2 && !(element.status === 'partial' || element.status === 'scored')">
+                                    <div *ngFor="let judge of getJudgeNames(element.judges)">{{judge | titlecase}}</div>
+                                    <button class="btn btn-danger btn-xs" (click)="removeJudges(element)" *ngIf="element.judges && !(element.status === 'partial' || element.status === 'scored')">
                                         Remove
                                     </button>
                                 </mat-cell>

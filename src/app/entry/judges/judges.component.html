@@ -1,4 +1,4 @@
-<div class="main-content" *ngIf="authService.user$ | async">
+<div class="main-content" *ngIf="authService.user$ | async as user">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
@@ -27,12 +27,12 @@
                                     <mat-cell *matCellDef="let element">{{ element.phone }}</mat-cell>
                                 </ng-container>
 
-                            <ng-container matColumnDef="roles" *ngIf="authService.canChangePermissions(user)">
+                            <ng-container matColumnDef="roles">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Roles</mat-header-cell>
                                 <mat-cell *matCellDef="let element">
-                                    <mat-checkbox [(ngModel)]="element.roles.judge">Judge</mat-checkbox>
-                                    <mat-checkbox [(ngModel)]="element.roles.superjudge">Super Judge</mat-checkbox>
-                                    <mat-checkbox [(ngModel)]="element.roles.admin">Admin</mat-checkbox>
+                                    <mat-checkbox [(ngModel)]="element.roles.judge" [disabled]="!authService.canChangePermissions(user)">Judge</mat-checkbox>
+                                    <mat-checkbox [(ngModel)]="element.roles.superjudge" [disabled]="!authService.canChangePermissions(user)">Super Judge</mat-checkbox>
+                                    <mat-checkbox [(ngModel)]="element.roles.admin" [disabled]="!authService.canChangePermissions(user)">Admin</mat-checkbox>
                                 </mat-cell>
                             </ng-container>
 

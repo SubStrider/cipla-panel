@@ -158,7 +158,7 @@ export class RaterComponent implements OnInit {
     this.loading = true
     console.log(this.judgeEntryForm.value)
     let val: JudgeEntry = this.judgeEntryForm.value
-    val.score = this.calculateScore(this.judgeEntryForm.value)
+    val.score = this.score
     this.ratings[this.index] = val
     let value = { judgeEntries: this.ratings, status: this.getStatus(this.ratings) }
     console.log(value)

@@ -5,6 +5,7 @@
   <ng-container *ngIf="(authService.canJudge(user)  && (user.name === rating.judgeName) || authService.canChangeScore(user)); then form else hidden"></ng-container>
 </ng-container>
 <ng-template #form>
+  <!-- {{rating | json}} -->
   <form [formGroup]="judgeEntryForm" (ngSubmit)="saveJudgeEntry()" class="rating-form">
     <div class="card">
       <div class="card-header">
@@ -73,9 +74,9 @@
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12" *ngIf="authService.canChangeScore(user)">
+          <div class="col-md-12" *ngIf="!rating.score || authService.canChangeScore(user)">
             <br>
-            <button type="submit" class="btn btn-primary btn-fill btn-wd" [disabled]="!judgeEntryForm.valid || loading" *ngIf="authService.canJudge(user)">{{loading ? 'Saving...' : 'Save Score'}}</button>
+            <button type="submit" class="btn btn-primary btn-fill btn-wd" [disabled]="!judgeEntryForm.valid || loading" *ngIf="!rating.score && authService.canJudge(user)">{{loading ? 'Saving...' : 'Save Score'}}</button>
           </div>
         </div>
       </div>

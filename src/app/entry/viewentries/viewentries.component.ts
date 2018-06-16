@@ -33,11 +33,10 @@ declare interface DataTable {
 
 export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     // dataRows: Observable<EntryTableData[]>;
-    displayedColumns = ['select', 'teamName', 'category', 'stage', 'status', 'scores','assignedTo'];
+    displayedColumns = ['select', 'teamName', 'category', 'stage', 'status', 'scores', 'assignedTo'];
     dataSource = new MatTableDataSource<EntryTableData>();
     dataDetail: EntryTableData[];
     private entriesSubscription: Subscription;
-    private emailSubscriptions: Subscription[] = [];
     private judgesSubscription: Subscription;
     userSubscription: ISubscription;
     categories: string[] = ['pharmaceutical', 'medical', 'devices', 'hospital', 'services', 'digital', 'diagnostics'];
@@ -73,28 +72,22 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnInit() {
 
-        this.userSubscription = this.authService.user$.subscribe(data => {
-            this.user = data
-        });
-
         this.judgesSubscription = this.dataService.usersChanged.subscribe((users: any[]) => {
+            this.judgesSubscription.unsubscribe()
             this.judges = users;
         })
 
         this.dataService.getUsers(true);
 
         this.entriesSubscription = this.dataService.entriesChanged.subscribe((entries: EntryTableData[]) => {
+            entries = _.compact(entries)
 
-            entries.forEach((entry, index) => {
-                let emailSubscription = this.afs.collection('users')
-                    .doc(entry['userId']).snapshotChanges()
-                    .subscribe(res => {
-                        if (res && entry) {
-                            entry['email'] = res['email']
-                        }
-                    });
-                
-                    this.emailSubscriptions.push(emailSubscription)
+            entries.forEach((entry) => {
+                this.dataService.getEmail(entry['userId']).then(data => {
+                    if (data) {
+                        entry['email'] = data['email']
+                    }
+                });
             });
 
             this.dataSource.data = entries;
@@ -105,7 +98,23 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
             this.selectedStage = params['stage']
             this.selectedStatus = params['status']
             this.minScore = params['min'] || '0'
-            this.dataService.fetchEntries(this.selectedCategory, this.selectedStage, this.minScore.toString(), null, this.selectedStatus);
+            this.userSubscription = this.authService.user$.subscribe(data => {
+                this.user = data
+
+                let role = this.user.roles.admin ? 'admin' : (this.user.roles.superjudge ? 'superjudge' : 'judge')
+                let id = null;
+                if(role === 'judge'){
+                    id = this.user.uid
+                }
+
+                this.dataService.fetchEntries(
+                    this.selectedCategory,
+                    this.selectedStage,
+                    this.selectedStatus,
+                    role,
+                    id
+                );
+            });
         }, error => {
             console.error(error)
         })
@@ -146,14 +155,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     ngOnDestroy() {
         this.entriesSubscription.unsubscribe();
-        this.entriesSubscription.remove;
-        this.emailSubscriptions.forEach(subscription => {
-            subscription.unsubscribe();
-            subscription.remove;
-        });
         this.dataSource.disconnect();
-        this.judgesSubscription.unsubscribe();
-        this.judgesSubscription.remove
     }
 
     selectCategory(category) {
@@ -172,24 +174,28 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
                     }
                 })
 
-                // Only allow changes to submissions if scoring is not initiated
-                if(submission['status'] === 'approved' || submission['status'] === 'rejected'){
+                let judges = _.fromPairs(_.zip(_.map(judgeEntries, 'judgeUID'), [true, true]))
 
-                }
-                this.dataService.updateSubmission(submission.submissionId, { 
-                    judgeEntries: judgeEntries, 
-                    judge1: this.selectedJudges[0]['uid'], 
-                    judge2: this.selectedJudges[1]['uid'] 
-                }).then(res => {
-                    console.log(res)
+                // Only allow changes to submissions if scoring is not initiated
+                if (submission['status'] === 'approved' || submission['status'] === 'rejected') {
+                    this.dataService.updateSubmission(submission.submissionId, {
+                        judgeEntries: judgeEntries,
+                        judges: judges
+                    }).then(res => {
+                        console.log(res)
+                        submission['loading'] = false
+                    }).catch(err => {
+                        console.error(err);
+                        submission['loading'] = true
+                    })
+                } else {
                     submission['loading'] = false
-                }).catch(err => {
-                    console.error(err);
-                    submission['loading'] = true
-                })
+                    window.alert('Cannot change judges if idea is beyond approved stage')
+                }
 
                 if (this.selection.selected.length === (index + 1)) {
                     this.loading = false
+                    window.alert(`${this.selection.selected.length} submissions have been assigned`)
                 }
             })
         } else {
@@ -203,9 +209,8 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     removeJudges(submission) {
         submission.loading = true
-        this.dataService.updateSubmission(submission.submissionId, { 
-            judge1: firebase.firestore.FieldValue.delete(),
-            judge2: firebase.firestore.FieldValue.delete()
+        this.dataService.updateSubmission(submission.submissionId, {
+            judges: firebase.firestore.FieldValue.delete()
         }).then(r => {
             console.log(`${submission.submissionId} updated`)
             submission.loading = false;
@@ -223,14 +228,6 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
             this.router.navigate(['/a/entry/viewentries'], { queryParams: { status: status.value }, queryParamsHandling: 'merge' })
         } else {
             this.router.navigate(['/a/entry/viewentries'], { queryParams: { status: null }, queryParamsHandling: 'merge' })
-        }
-    }
-
-    selectMinScore(score) {
-        if (score.value > 0) {
-            this.router.navigate(['/a/entry/viewentries'], { queryParams: { min: score.value }, queryParamsHandling: 'merge' })
-        } else {
-            this.router.navigate(['/a/entry/viewentries'], { queryParams: { min: null }, queryParamsHandling: 'merge' })
         }
     }
 
@@ -266,12 +263,12 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
             this.dataSource.data.forEach(row => this.selection.select(row));
     }
 
-    getJudgeName(uid) {
-        if(uid){
-            let found = _.find(this.judges, { uid: uid })
-            return found ? found.name : 'No Judge'
-        } else {
-            'No Judge'
-        }
+    getJudgeNames(judges:any) {
+        let uids = _.keys(judges)
+        let names = _.map(uids, uid => {
+            let found = _.find(this.judges, {uid: uid})
+            return found.name || 'No Name'
+        })
+        return names;
     }
 }

@@ -20,8 +20,6 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
     displayedColumns = ['name', 'email', 'phone','roles','actions'];
     dataSource = new MatTableDataSource<UserTableData>();
     dataDetail: UserTableData[];
-    usersSubscription: Subscription;
-    userSubscription: ISubscription;
     user: any;
     // loading: boolean;
     
@@ -35,14 +33,11 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
     ){ }
 
     ngOnInit(){
-        this.usersSubscription = this.dataService.usersChanged.subscribe((entries: UserTableData[]) => {
+        let usersSubscription = this.dataService.usersChanged.subscribe((entries: UserTableData[]) => {
+            usersSubscription.unsubscribe()
             this.dataSource.data = entries;
         });
         this.dataService.getUsers()
-
-        this.userSubscription = this.authService.user$.subscribe(user => {
-            this.user = user
-        })
     }
 
     doFilter(filterValue: string) {
@@ -54,8 +49,6 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit{
     }
 
     ngOnDestroy(){
-        this.usersSubscription.unsubscribe();
-        this.userSubscription.unsubscribe();
         this.dataSource.disconnect();
     }
 

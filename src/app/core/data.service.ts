@@ -29,17 +29,18 @@ export class DataService {
         return (score1 + score2) / (_.compact([score1, score2]).length)
     }
 
-    fetchEntries(category?: string, stage?: string, minR1Score?: string, maxR1Score?: number, status?: string, judge1?: string, judge2?: string) {
+    fetchEntries(category?: string, stage?: string, status?: string, role: string = 'judge', id?: string, style?: string) {
 
         this.afs.collection('submissions', ref => {
             let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
             if (category) { query = query.where('category', '==', category) }
             if (stage) { query = query.where('stage', '==', stage) }
-            // if (minR1Score && minR1Score !== '0') { query = query.where('r1Score', '>', parseInt(minR1Score)) };
-            if (judge1) { query = query.where('judge1', '==', judge1) }
-            if (judge2) { query = query.where('judge2', '==', judge2) }
             if (status && status !== 'submitted') {
                 query = query.where('status', '==', status)
+            }
+            
+            if(role === 'judge'){
+                if (id) { query = query.where(`judges.${id}`, '==', true) }
             }
             return query;
         })
@@ -47,36 +48,43 @@ export class DataService {
             .map(docArray => {
                 return docArray.map(doc => {
 
-                    let judgeEntries = doc.payload.doc.data().judgeEntries;
+
+                    let payload = doc.payload.doc;
+                    let judgeEntries = payload.data().judgeEntries;
 
                     let score1 = judgeEntries && judgeEntries.length ? judgeEntries[0].score : 0;
                     let score2 = judgeEntries && judgeEntries.length && judgeEntries[1] ? judgeEntries[1].score : 0;
 
-                    return {
-                        teamName: doc.payload.doc.data().teamName,
-                        category: doc.payload.doc.data().category,
-                        stage: doc.payload.doc.data().stage,
+
+                    let data = {
+                        teamName: payload.data().teamName,
+                        category: payload.data().category,
+                        stage: payload.data().stage,
                         score1: score1,
                         score2: score2,
                         avgScore: score1 || score2 ? this.getAverageScore(score1, score2) : 0,
-                        submissionId: doc.payload.doc.id,
-                        userId: doc.payload.doc.data().userId,
-                        numericId: this.getNumberId(doc.payload.doc.id),
-                        // pitch: doc.payload.doc.data().pitch,
-                        // overview: doc.payload.doc.data().overview,
-                        // potential: doc.payload.doc.data().potential,
-                        // market: doc.payload.doc.data().market,
-                        // competition: doc.payload.doc.data().competition,
-                        // teamSize: doc.payload.doc.data().teamSize,
-                        // revenue: doc.payload.doc.data().revenue,
-                        // year: doc.payload.doc.data().year,
-                        // website: doc.payload.doc.data().website,
-                        // partner: doc.payload.doc.data().partner,
-                        // attachment: doc.payload.doc.data().attachment,
-                        status: doc.payload.doc.data().status ? doc.payload.doc.data().status : 'submitted',
-                        judge1: doc.payload.doc.data().judge1,
-                        judge2: doc.payload.doc.data().judge2
+                        submissionId: payload.id,
+                        userId: payload.data().userId,
+                        numericId: this.getNumberId(payload.id),
+                        status: payload.data().status ? payload.data().status : 'submitted',
+                        judges: payload.data().judges
                     };
+
+                    if (style === 'full') {
+                        data['pitch'] = payload.data().pitch
+                        data['overview'] = payload.data().overview
+                        data['potential'] = payload.data().potentil
+                        data['market'] = payload.data().market
+                        data['competition'] = payload.data().competition
+                        data['teamSize'] = payload.data().teamSize
+                        data['revenue'] = payload.data().revenue
+                        data['year'] = payload.data().year
+                        data['website'] = payload.data().website
+                        data['partner'] = payload.data().partner
+                        data['attachment'] = payload.data().attachment
+                    }
+
+                    return data;
                 });
             })
             .subscribe((fetchedEntries: EntryTableData[]) => {
@@ -115,6 +123,12 @@ export class DataService {
             delete value.loading
         }
         return this.afs.collection('submissions').doc(submissionId).update(value)
+    }
+
+    getEmail(userId) {
+        return this.afs.collection('users').doc(userId).ref.get().then(doc => {
+            return doc.data()
+        })
     }
 
 }
