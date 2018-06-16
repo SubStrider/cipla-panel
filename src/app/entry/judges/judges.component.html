@@ -11,7 +11,7 @@
                             </mat-form-field>
                         </div>
 
-                        <mat-table [dataSource]="dataSource" matSort >
+                        <mat-table [dataSource]="dataSource" matSort>
                             <ng-container matColumnDef="name">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Name</mat-header-cell>
                                 <mat-cell *matCellDef="let element">{{ element.name | titlecase }}<br><small>{{element.uid}}</small></mat-cell>

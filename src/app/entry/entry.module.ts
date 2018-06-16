@@ -11,6 +11,7 @@ import {MaterialModule} from '../material.module';
 import { DetailComponent } from './detail/detail.component';
 import { MatRadioModule, MatRadioButton } from '@angular/material/radio';
 import {MatSliderModule} from '@angular/material/slider';
+import { RaterComponent } from './detail/rater/rater.component';
 
 @NgModule({
     imports: [
@@ -28,6 +29,7 @@ import {MatSliderModule} from '@angular/material/slider';
         JudgesComponent,
         ViewentriesComponent,
         DetailComponent,
+        RaterComponent,
     ]
 })
 

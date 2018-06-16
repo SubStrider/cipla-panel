@@ -1,0 +1,8 @@
+.rating-form{
+    margin-bottom: 16px;
+}
+
+form label{
+    display:block !important;
+    clear: both;
+}
