@@ -1,9 +1,6 @@
 import { AfterViewInit, Component, OnInit, OnDestroy, AfterViewChecked } from '@angular/core';
 import * as Chartist from 'chartist';
-import { EntryTableData } from '../../core/user.model';
 import { DataService } from '../../core/data.service';
-import { Observable } from 'rxjs/Observable';
-import { StatsData } from '../../core/user.model';
 import { AngularFirestore } from 'angularfire2/firestore';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -267,18 +264,14 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.statsSubscription.unsubscribe()
                 this.reset()
                 let weekCount = []
-                let countries = []
-
                 let judged = 0;
 
                 result.forEach(value => {
-                    let catCount = 0;
-                    let stageCount = 0;
                     this.totCount++;
                     this.checkArrayAndUpdate(this.catCount, value.category)
                     this.checkArrayAndUpdate(this.stageCount, value.stage || 'ideation')
 
-                    if(value.status ==='scored'){
+                    if(value.status ==='completed'){
                         judged++
                     }
 
@@ -302,14 +295,6 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                             this.addCountry('india')
                         }
                     })
-
-                    // let emailSubscription = this.afs.collection('users')
-                    //     .doc(value.userID).valueChanges()
-                    //     .subscribe(res => {
-                            
-                    //     });
-                    
-                    // this.emailSubscriptions.push(emailSubscription)
                 });
 
                 let weekData = _.chain(weekCount).sortBy('weekNumber').groupBy('weekNumber').value()
@@ -336,9 +321,6 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnDestroy() {
         this.userSubscription.unsubscribe();
         this.statsSubscription.unsubscribe();
-        // this.emailSubscriptions.forEach(subscription => {
-        //     subscription.unsubscribe();
-        // })
     }
 
 }

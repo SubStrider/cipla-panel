@@ -148,9 +148,9 @@ export class RaterComponent implements OnInit {
   getStatus(ratings: JudgeEntry[]): string {
     let scores = _.compact(_.map(ratings, 'score'))
     if (scores.length === 2) {
-      return 'scored'
+      return 'completed'
     } else {
-      return 'partial'
+      return 'scored'
     }
   }
 

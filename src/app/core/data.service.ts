@@ -52,22 +52,30 @@ export class DataService {
                     let payload = doc.payload.doc;
                     let judgeEntries = payload.data().judgeEntries;
 
-                    let score1 = judgeEntries && judgeEntries.length ? judgeEntries[0].score : 0;
-                    let score2 = judgeEntries && judgeEntries.length && judgeEntries[1] ? judgeEntries[1].score : 0;
+                    // let score1 = judgeEntries && judgeEntries.length ? judgeEntries[0].score : 0;
+                    // let score2 = judgeEntries && judgeEntries.length && judgeEntries[1] ? judgeEntries[1].score : 0;
 
+                    let scores = _.map(judgeEntries, entry => {
+                        return {
+                            judgeId: entry.judgeUID,
+                            score: entry.score
+                        }
+                    })
+
+                    let score1 = scores[0] ? scores[0].score : 0
+                    let score2 = scores[1] ? scores[1].score : 0
 
                     let data = {
                         teamName: payload.data().teamName,
                         category: payload.data().category,
                         stage: payload.data().stage,
-                        score1: score1,
-                        score2: score2,
                         avgScore: score1 || score2 ? this.getAverageScore(score1, score2) : 0,
                         submissionId: payload.id,
                         userId: payload.data().userId,
                         numericId: this.getNumberId(payload.id),
                         status: payload.data().status ? payload.data().status : 'submitted',
-                        judges: payload.data().judges
+                        judges: payload.data().judges,
+                        entries: scores
                     };
 
                     if (style === 'full') {

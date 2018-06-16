@@ -59,10 +59,9 @@ export interface EntryTableData {
     category: string;
     stage: string;
     status: string;
-    score1: number;
-    score2: number;
     submissionId: string;
     numericId: string;
+    entries: any[];
 }
 
 export interface StatsData {

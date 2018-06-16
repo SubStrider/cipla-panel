@@ -41,7 +41,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     userSubscription: ISubscription;
     categories: string[] = ['pharmaceutical', 'medical', 'devices', 'hospital', 'services', 'digital', 'diagnostics'];
     stages: string[] = ['ideation', 'poc', 'revenues'];
-    statuses: string[] = ['submitted', 'approved', 'rejected', 'scored'];
+    statuses: string[] = ['submitted', 'approved', 'rejected', 'scored', 'completed'];
     judges: any[] = [];
     user: User;
     loading: boolean;
@@ -177,7 +177,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
                 let judges = _.fromPairs(_.zip(_.map(judgeEntries, 'judgeUID'), [true, true]))
 
                 // Only allow changes to submissions if scoring is not initiated
-                if (submission['status'] === 'approved' || submission['status'] === 'rejected') {
+                if (submission['status'] === 'approved') {
                     this.dataService.updateSubmission(submission.submissionId, {
                         judgeEntries: judgeEntries,
                         judges: judges

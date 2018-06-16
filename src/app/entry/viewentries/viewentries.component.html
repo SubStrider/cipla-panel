@@ -44,11 +44,11 @@
                                 <button class="btn btn-success btn-xs" (click)="assignJudges()">Assign</button>
                             </div>
 
-                            <div class="col-xs-6 col-md-3">
+                            <!-- <div class="col-xs-6 col-md-3">
                                 <label>Minimum Score</label>
                                 <mat-slider [max]="5" [min]="0" [step]="1" [thumbLabel]="true" [tickInterval]="1" (change)="selectMinScore($event)" [(ngModel)]="minScore">
                                 </mat-slider>
-                            </div>
+                            </div> -->
                             <div class="col-xs-6 col-md-3">
                                 <mat-checkbox (change)="selectCipla($event)">Show only Cipla</mat-checkbox>
                             </div>
@@ -64,7 +64,7 @@
                                     </mat-checkbox>&nbsp;&nbsp;&nbsp;
                                 </th>
                                 <td mat-cell *matCellDef="let row">
-                                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+                                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [disabled]="!(row.status === 'approved')">
                                     </mat-checkbox>&nbsp;&nbsp;&nbsp;
                                 </td>
                             </ng-container>
@@ -100,8 +100,8 @@
                                             'label-default': element.status === 'submitted',
                                             'label-warning': element.status === 'approved',
                                             'label-danger': element.status === 'rejected',
-                                            'label-info': element.status === 'partial',
-                                            'label-success': element.status === 'scored'
+                                            'label-info': element.status === 'scored',
+                                            'label-success': element.status === 'completed'
                                         }">
                                         {{ element.status | titlecase }}
                                     </span>
@@ -111,30 +111,22 @@
                             <ng-container matColumnDef="scores">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Score</mat-header-cell>
                                 <mat-cell *matCellDef="let element">
-                                    <h2 *ngIf="authService.canChangeScore(user)">
-                                        <span [ngClass]="{
-                                            'label-danger': element.score1 < 3, 
-                                            'label-warning': element.score1 >= 3 && element.score1 < 4, 
-                                            'label-success': element.score1 >= 4}
+                                    <h4 *ngIf="authService.canChangeScore(user) && element.avgScore">
+                                        <span class="label" [ngClass]="{
+                                            'label-danger': element.avgScore < 3, 
+                                            'label-warning': element.avgScore >= 3 && element.avgScore < 4, 
+                                            'label-success': element.avgScore >= 4}
                                             ">
-                                            {{avgScore | number:'1.2-2'}}
+                                            {{element.avgScore | number:'1.2-2'}}
                                         </span>
-                                    </h2>
-                                    <span class="label" [ngClass]="{
-                                        'label-danger': element.score1 < 3, 
-                                        'label-warning': element.score1 >= 3 && element.score1 < 4, 
-                                        'label-success': element.score1 >= 4}
-                                        " *ngIf="element.score1 && (element.judge1 === user.uid)">
-                                        {{element.score1 | number:'1.2-2'}}
+                                    </h4>
+                                    <span [ngClass]="{
+                                        'text-danger': entry.score < 3, 
+                                        'text-warning': entry.score >= 3 && entry.score < 4, 
+                                        'text-success': entry.score >= 4}
+                                        " [hidden]="!(authService.canChangeScore(user) || (entry.judgeId === user.uid))" *ngFor="let entry of element.entries">
+                                        {{entry.score | number:'1.2-2'}}
                                     </span>
-                                    <span class="label" [ngClass]="{
-                                        'label-danger': element.score2 < 3, 
-                                        'label-warning': element.score2 >= 3 && element.score2 < 4, 
-                                        'label-success': element.score2 >= 4}
-                                        " *ngIf="element.score2 && (element.judge2 === user.uid)">
-                                        {{element.score2 | number:'1.2-2'}}
-                                    </span>
-                                        <!-- *ngIf="authService.canChangeScore(user)" -->
                                 </mat-cell>
                             </ng-container>
 
@@ -142,7 +134,7 @@
                                 <mat-header-cell *matHeaderCellDef>Assigned to</mat-header-cell>
                                 <mat-cell *matCellDef="let element">
                                     <div *ngFor="let judge of getJudgeNames(element.judges)">{{judge | titlecase}}</div>
-                                    <button class="btn btn-danger btn-xs" (click)="removeJudges(element)" *ngIf="element.judges && !(element.status === 'partial' || element.status === 'scored')">
+                                    <button class="btn btn-danger btn-xs" (click)="removeJudges(element)" *ngIf="element.judges && !(element.status === 'completed' || element.status === 'scored')">
                                         Remove
                                     </button>
                                 </mat-cell>
