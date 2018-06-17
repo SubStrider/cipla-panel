@@ -1,0 +1,12 @@
+<div class="main-content">
+  <div class="container-fluid">
+    <button (click)="requestReport()" class="btn btn-default pull-right">
+      Generate Submissions Report
+    </button>
+    <h2>Reports</h2>
+    <hr>
+      <div *ngFor="let report of reports | async">
+        <report-link [report]="report"></report-link>
+      </div>
+  </div>
+</div>

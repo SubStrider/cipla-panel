@@ -15,7 +15,8 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.authService.initAuthListener();
-    this.router.events.subscribe((evt) => {
+    let routerSubscription = this.router.events.subscribe((evt) => {
+      routerSubscription.unsubscribe()
       if (!(evt instanceof NavigationEnd)) {
         return;
       }

@@ -1,9 +1,6 @@
 import { AfterViewInit, Component, OnInit, OnDestroy, AfterViewChecked } from '@angular/core';
 import * as Chartist from 'chartist';
-import { EntryTableData } from '../../core/user.model';
 import { DataService } from '../../core/data.service';
-import { Observable } from 'rxjs/Observable';
-import { StatsData } from '../../core/user.model';
 import { AngularFirestore } from 'angularfire2/firestore';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -25,6 +22,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     judged: number = 0;
     userSubscription: ISubscription;
     statsSubscription: ISubscription;
+    emailSubscriptions: ISubscription[] = [];
 
     catCount: any[] = [
         { name: 'pharmaceutical', count: 0 },
@@ -147,7 +145,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             },
             low: 10,
             height: "250px",
-            high: 300,
+            high: 1000,
             classNames: {
                 point: 'ct-point ct-green',
                 line: 'ct-line ct-green'
@@ -195,15 +193,17 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     checkArrayAndUpdate(arr: any[], name: string) {
+        let other:any = {name: 'other'}
         if (name) {
-            let found = _.find(arr, { name: name })
+            let obj:any = {name:name}
+            let found = _.find(arr,  obj)
             if (found) {
-                _.find(arr, { name: name })['count'] += 1;
+                _.find(arr, obj)['count'] += 1;
             } else {
-                _.find(arr, { name: 'other' })['count'] += 1;
+                _.find(arr, other)['count'] += 1;
             }
         } else {
-            _.find(arr, { name: 'other' })['count'] += 1;
+            _.find(arr, other)['count'] += 1;
         }
     }
 
@@ -216,7 +216,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 })
             })
             .subscribe(result => {
-
+                this.userSubscription.unsubscribe()
 
                 this.count = { total: 0, cipla: 0 };
                 this.count['total'] = result.length
@@ -261,20 +261,17 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 });
             })
             .subscribe(result => {
+                this.statsSubscription.unsubscribe()
                 this.reset()
                 let weekCount = []
-                let countries = []
-
                 let judged = 0;
 
                 result.forEach(value => {
-                    let catCount = 0;
-                    let stageCount = 0;
                     this.totCount++;
                     this.checkArrayAndUpdate(this.catCount, value.category)
                     this.checkArrayAndUpdate(this.stageCount, value.stage || 'ideation')
 
-                    if(value.status){
+                    if(value.status ==='completed'){
                         judged++
                     }
 
@@ -284,22 +281,20 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                         date: value.createdAt || moment('2018-05-24').toDate()
                     })
 
-                    this.afs.collection('users')
-                        .doc(value.userID).valueChanges()
-                        .subscribe(res => {
-                            if (res && res['email'] && res['email'].includes('@cipla.com')) {
-                                this.totCiplaR1++;
-                            }
-                            if(res && res['country']){
-                                if(res['country'].toLowerCase().includes('india')){
-                                    this.addCountry('india')
-                                } else {
-                                    this.addCountry('overseas')
-                                }
-                            } else {
+                    this.dataService.getEmail(value.userID).then(res => {
+                        if (res && res['email'] && res['email'].includes('@cipla.com')) {
+                            this.totCiplaR1++;
+                        }
+                        if(res && res['country']){
+                            if(res['country'].toLowerCase().includes('india')){
                                 this.addCountry('india')
+                            } else {
+                                this.addCountry('overseas')
                             }
-                        });
+                        } else {
+                            this.addCountry('india')
+                        }
+                    })
                 });
 
                 let weekData = _.chain(weekCount).sortBy('weekNumber').groupBy('weekNumber').value()

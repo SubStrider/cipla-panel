@@ -1,9 +1,7 @@
-<div class="main-content">
+<div class="main-content" *ngIf="user">
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 mb-2">
-                <button class="btn btn-default pull-right" (click)="downloadSubmissionsCsv()">Download CSV</button>
-
                 <div fxLayoutAlign="center center">
                     <mat-form-field fxFlex="100%">
                         <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Start Searching by any term">
@@ -29,45 +27,57 @@
                                 </mat-form-field>
                             </div>
                             <div class="col-xs-6 col-md-3">
-                                    <mat-form-field>
-                                            <mat-select placeholder="Status" (change)="selectStatus($event)" [ngModel]="selectedStatus">
-                                                <mat-option *ngFor="let status of statuses" [value]="status">{{status | titlecase}}</mat-option>
-                                            </mat-select>
-                                        </mat-form-field>   
+                                <mat-form-field>
+                                    <mat-select placeholder="Status" (change)="selectStatus($event)" [ngModel]="selectedStatus">
+                                        <mat-option *ngFor="let status of statuses" [value]="status">{{status | titlecase}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
                             </div>
-                            <div class="col-xs-6 col-md-3">
+                            <div class="col-xs-6 col-md-3" *ngIf="authService.canChangePermissions(user)">
+                                <mat-form-field>
+                                    <mat-select placeholder="Select Judges" [ngModel]="selectedJudges" multiple (change)="selectJudges($event)">
+                                        <mat-option *ngFor="let judge of judges" [value]="judge">{{judge.name | titlecase}}</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <button class="btn btn-success btn-xs" (click)="assignJudges()" [disabled]="loading">{{loading ? 'Please wait..' : 'Assign'}}</button>
+                            </div>
+
+                            <!-- <div class="col-xs-6 col-md-3">
                                 <label>Minimum Score</label>
-                                    <mat-slider
-                                    [max]="5"
-                                    [min]="0"
-                                    [step]="1"
-                                    [thumbLabel]="true"
-                                    [tickInterval]="1"
-                                    (change) = "selectMinScore($event)"
-                                    [(ngModel)]="minScore">
+                                <mat-slider [max]="5" [min]="0" [step]="1" [thumbLabel]="true" [tickInterval]="1" (change)="selectMinScore($event)" [(ngModel)]="minScore">
                                 </mat-slider>
-                            </div>
-                            <div class="col-xs-12">
+                            </div> -->
+                            <div class="col-xs-6 col-md-3">
                                 <mat-checkbox (change)="selectCipla($event)">Show only Cipla</mat-checkbox>
                             </div>
-                            <div class="col-xs-12">
-                                <hr>
+                            <div class="col-xs-6 col-md-3">
                                 <button type="button" class="btn btn-default float-right" (click)="reset()">Reset</button>
-                                <hr>
                             </div>
                         </div>
                         <mat-table [dataSource]="dataSource" matSort>
-                            <ng-container matColumnDef="numericId">
-                                <mat-header-cell *matHeaderCellDef mat-sort-header>Numeric ID</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{element.numericId}}
-                                </mat-cell>
+                            <ng-container matColumnDef="select">
+                                <th mat-header-cell *matHeaderCellDef>
+                                    <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()"
+                                        [disabled]="true">
+                                    </mat-checkbox>&nbsp;&nbsp;&nbsp;
+                                </th>
+                                <td mat-cell *matCellDef="let row">
+                                    <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [disabled]="!(row.status === 'approved')">
+                                    </mat-checkbox>&nbsp;&nbsp;&nbsp;
+                                </td>
                             </ng-container>
-                            
                             <ng-container matColumnDef="teamName">
                                 <mat-header-cell *matHeaderCellDef mat-sort-header>Team Name</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.teamName || 'No team name' }}
-                                    <br>
-                                    <small class="text-success">{{element.email}}</small>
+                                <mat-cell *matCellDef="let element">
+                                    <a class="text-primary" [routerLink]="['/a/entry/detail', element.submissionId]" target="_blank" [attr.disabled]="element.loading">
+                                        {{ element.teamName || 'No team name' }}
+                                        <span data-notify="icon" [ngClass]="{
+                                                'ti-angle-right': !element.loading,
+                                                'ti-more': element.loading
+                                            }"></span>
+                                    </a>
+                                    <div class="text-success small">{{element.email}}</div>
+                                    <div class="text-dark small">{{element.numericId}}</div>
                                 </mat-cell>
                             </ng-container>
 
@@ -82,43 +92,59 @@
                             </ng-container>
 
                             <ng-container matColumnDef="status">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
-                                    <mat-cell *matCellDef="let element">
-                                        <span class="label" [ngClass]="{
+                                <mat-header-cell *matHeaderCellDef mat-sort-header>Status</mat-header-cell>
+                                <mat-cell *matCellDef="let element">
+                                    <span class="label" [ngClass]="{
                                             'label-default': element.status === 'submitted',
                                             'label-warning': element.status === 'approved',
                                             'label-danger': element.status === 'rejected',
-                                            'label-success': element.status === 'scored'
+                                            'label-info': element.status === 'scored',
+                                            'label-success': element.status === 'completed'
                                         }">
-                                            {{ element.status | titlecase }}
-                                        </span>
-                                    </mat-cell>
-                                </ng-container>
-
-                            <ng-container matColumnDef="r1Score">
-                                <mat-header-cell *matHeaderCellDef mat-sort-header>R1 Score</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.r1Score | number }}</mat-cell>
-                            </ng-container>
-
-                            <ng-container matColumnDef="r2Score">
-                                <mat-header-cell *matHeaderCellDef mat-sort-header>R2 Score</mat-header-cell>
-                                <mat-cell *matCellDef="let element">{{ element.r2Score | number }}</mat-cell>
-                            </ng-container>
-
-                            <ng-container matColumnDef="actions">
-                                <mat-header-cell *matHeaderCellDef>Actions</mat-header-cell>
-                                <mat-cell *matCellDef="let element">
-                                    <a class="btn btn-icon btn-fill btn-tumblr" [routerLink]="['/a/entry/detail', element.submissionId]" target="_blank">
-                                        <span data-notify="icon" class="ti-angle-right"></span>
-                                    </a>
+                                        {{ element.status | titlecase }}
+                                    </span>
                                 </mat-cell>
                             </ng-container>
+
+                            <ng-container matColumnDef="scores">
+                                <mat-header-cell *matHeaderCellDef mat-sort-header>Score</mat-header-cell>
+                                <mat-cell *matCellDef="let element">
+                                    <h4 *ngIf="authService.canChangeScore(user) && element.avgScore">
+                                        <span class="label" [ngClass]="{
+                                            'label-danger': element.avgScore < 3, 
+                                            'label-warning': element.avgScore >= 3 && element.avgScore < 4, 
+                                            'label-success': element.avgScore >= 4}
+                                            ">
+                                            {{element.avgScore | number:'1.2-2'}}
+                                        </span>
+                                    </h4>
+                                    <span [ngClass]="{
+                                        'text-danger': entry.score < 3, 
+                                        'text-warning': entry.score >= 3 && entry.score < 4, 
+                                        'text-success': entry.score >= 4}
+                                        " [hidden]="!(authService.canChangeScore(user) || (entry.judgeId === user.uid))" *ngFor="let entry of element.entries">
+                                        {{entry.score | number:'1.2-2'}}
+                                    </span>
+                                </mat-cell>
+                            </ng-container>
+
+                            <ng-container matColumnDef="assignedTo">
+                                <mat-header-cell *matHeaderCellDef>Assigned to</mat-header-cell>
+                                <mat-cell *matCellDef="let element">
+                                    <div *ngFor="let judge of getJudgeNames(element.judges)">{{judge | titlecase}}</div>
+                                    <button class="btn btn-danger btn-xs" (click)="removeJudges(element)" *ngIf="element.judges && !(element.status === 'completed' || element.status === 'scored')">
+                                        Remove
+                                    </button>
+                                </mat-cell>
+                            </ng-container>
+
+
 
                             <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                             <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
                         </mat-table>
 
-                        <mat-paginator #paginator [pageSize]="100" [pageSizeOptions]="[50, 100, 200]" (page)="scrollTop()">
+                        <mat-paginator #paginator [pageSize]="100" [pageSizeOptions]="[100, 250]" (page)="scrollTop()" showFirstLastButtons>
                         </mat-paginator>
                     </div>
                 </div>

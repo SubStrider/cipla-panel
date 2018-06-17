@@ -105,7 +105,12 @@ export const ROUTES: RouteInfo[] = [
         title: 'Manage Users',
         type: 'link',
         icontype: 'ti-id-badge'
-
+    },
+    {
+        path: 'entry/reports',
+        title: 'Reports',
+        type: 'link',
+        icontype: 'ti-package'
     },
     // {
     //     path: '/charts',

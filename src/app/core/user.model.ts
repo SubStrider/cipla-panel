@@ -2,7 +2,8 @@ export interface Roles {
     user?: boolean,
     screener?: boolean,
     judge?: boolean,
-    admin?: boolean
+    admin?: boolean,
+    superjudge?:boolean
 }
 
 export interface Members {
@@ -44,6 +45,8 @@ export interface BasicSubmission {
     website?: string;
     partner?: string;
     attachment?: string;
+    preScreen: preScreen;
+    judgeEntries: JudgeEntry[];
 }
 
 export interface AuthData {
@@ -55,10 +58,10 @@ export interface EntryTableData {
     teamName: string;
     category: string;
     stage: string;
-    r1Score: number;
-    r2Score: number;
+    status: string;
     submissionId: string;
     numericId: string;
+    entries: any[];
 }
 
 export interface StatsData {
@@ -102,14 +105,18 @@ export interface Criteria {
 }
 
 export interface JudgeEntry {
-    revenuePotential3rd: Criteria;
-    implementability: Criteria;
-    synergy: Criteria;
-    uniqueness: Criteria;
+    revenuePotential: number;
+    implementability: number;
+    synergy: number;
+    uniqueness: number;
     judgeUID: string;
+    judgeName: string;
     comments: string;
-    revPotential: boolean;
-    healthcare: boolean;
+    score: number;
 }
 
+export interface preScreen{
+    health: string;
+    revenue: string;
+}
 
