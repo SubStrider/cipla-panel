@@ -1,12 +1,9 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AngularFirestore } from 'angularfire2/firestore';
 import { DataService } from '../../core/data.service';
-import { Observable } from 'rxjs/Observable';
-import { map } from 'rxjs/operators';
 import { EntryTableData, User } from '../../core/user.model';
 import { MatTableDataSource, MatSort, MatPaginator } from '@angular/material';
 import { Subscription, ISubscription } from 'rxjs/Subscription';
-import { AngularFirestoreDocument } from 'angularfire2/firestore';
 import { PapaParseService } from 'ngx-papaparse';
 import * as moment from 'moment';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -32,12 +29,12 @@ declare interface DataTable {
 })
 
 export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
-    // dataRows: Observable<EntryTableData[]>;
     displayedColumns = ['select', 'teamName', 'category', 'stage', 'status', 'scores', 'assignedTo'];
     dataSource = new MatTableDataSource<EntryTableData>();
     dataDetail: EntryTableData[];
     private entriesSubscription: Subscription;
     private judgesSubscription: Subscription;
+    // downloadSubscription: Subscription;
     userSubscription: ISubscription;
     categories: string[] = ['pharmaceutical', 'medical', 'devices', 'hospital', 'services', 'digital', 'diagnostics'];
     stages: string[] = ['ideation', 'poc', 'revenues'];
@@ -91,6 +88,8 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
             });
 
             this.dataSource.data = entries;
+            this.dataSource.sort = this.sort;
+            this.dataSource.paginator = this.paginator;
         });
 
         this.activatedRoute.queryParams.subscribe(params => {
@@ -103,7 +102,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
                 let role = this.user.roles.admin ? 'admin' : (this.user.roles.superjudge ? 'superjudge' : 'judge')
                 let id = null;
-                if(role === 'judge'){
+                if (role === 'judge') {
                     id = this.user.uid
                 }
 
@@ -120,25 +119,6 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
         })
 
     }
-
-    downloadSubmissionsCsv() {
-        let csvData = this.papa.unparse(this.dataSource.data, { header: true })
-        this.download(`Submissions - ${moment().format('MMM dd hhmmss')}`, csvData)
-    }
-
-    download(filename, text) {
-        var element = document.createElement('a');
-        element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(text));
-        element.setAttribute('download', filename);
-
-        element.style.display = 'none';
-        document.body.appendChild(element);
-
-        element.click();
-
-        document.body.removeChild(element);
-    }
-
 
     ngAfterViewInit() {
         this.dataSource.sort = this.sort;
@@ -165,40 +145,46 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     assignJudges() {
         this.loading = true
         if (this.selectedJudges && (this.selectedJudges.length === 2)) {
-            this.selection.selected.forEach((submission, index) => {
-                submission['loading'] = true
-                let judgeEntries = _.map(this.selectedJudges, judge => {
-                    return {
-                        judgeUID: judge['uid'],
-                        judgeName: judge['name']
+            if(this.selection.selected.length){
+                this.selection.selected.forEach((submission, index) => {
+                    submission['loading'] = true
+                    let judgeEntries = _.map(this.selectedJudges, judge => {
+                        return {
+                            judgeUID: judge['uid'],
+                            judgeName: judge['name']
+                        }
+                    })
+    
+                    let judges = _.fromPairs(_.zip(_.map(judgeEntries, 'judgeUID'), [true, true]))
+    
+                    // Only allow changes to submissions if scoring is not initiated
+                    if (submission['status'] === 'approved') {
+                        this.dataService.updateSubmission(submission.submissionId, {
+                            judgeEntries: judgeEntries,
+                            judges: judges
+                        }).then(res => {
+                            console.log(res)
+                            submission['loading'] = false
+                        }).catch(err => {
+                            console.error(err);
+                            submission['loading'] = true
+                        })
+                    } else {
+                        submission['loading'] = false
+                        window.alert('Cannot change judges if idea is beyond approved stage')
+                    }
+    
+                    if (this.selection.selected.length === (index + 1)) {
+                        this.loading = false
+                        window.alert(`${this.selection.selected.length} submissions have been assigned`)
                     }
                 })
-
-                let judges = _.fromPairs(_.zip(_.map(judgeEntries, 'judgeUID'), [true, true]))
-
-                // Only allow changes to submissions if scoring is not initiated
-                if (submission['status'] === 'approved') {
-                    this.dataService.updateSubmission(submission.submissionId, {
-                        judgeEntries: judgeEntries,
-                        judges: judges
-                    }).then(res => {
-                        console.log(res)
-                        submission['loading'] = false
-                    }).catch(err => {
-                        console.error(err);
-                        submission['loading'] = true
-                    })
-                } else {
-                    submission['loading'] = false
-                    window.alert('Cannot change judges if idea is beyond approved stage')
-                }
-
-                if (this.selection.selected.length === (index + 1)) {
-                    this.loading = false
-                    window.alert(`${this.selection.selected.length} submissions have been assigned`)
-                }
-            })
+            } else {
+                this.loading = false;
+                window.alert('Please select some ideas to assign judges');
+            }
         } else {
+            this.loading = false;
             window.alert('Please select 2 judges to assign these ideas to!')
         }
     }
@@ -216,7 +202,6 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
             submission.loading = false;
         })
 
-        // this.dataService.fetchEntries(this.selectedCategory, this.selectedStage, this.minScore.toString(), null, this.selectedStatus);
     }
 
     selectStage(stage) {
@@ -263,11 +248,11 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
             this.dataSource.data.forEach(row => this.selection.select(row));
     }
 
-    getJudgeNames(judges:any) {
+    getJudgeNames(judges: any) {
         let uids = _.keys(judges)
         let names = _.map(uids, uid => {
-            let found = _.find(this.judges, {uid: uid})
-            return found.name || 'No Name'
+            let found = _.find(this.judges, { uid: uid })
+            return found ? found.name : 'No Name'
         })
         return names;
     }

@@ -145,7 +145,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
             },
             low: 10,
             height: "250px",
-            high: 300,
+            high: 1000,
             classNames: {
                 point: 'ct-point ct-green',
                 line: 'ct-line ct-green'

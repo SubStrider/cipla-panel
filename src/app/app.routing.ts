@@ -9,6 +9,7 @@ import { OverviewComponent } from './dashboard/overview/overview.component';
 import { JudgesComponent } from './entry/judges/judges.component';
 import { ViewentriesComponent } from './entry/viewentries/viewentries.component';
 import { DetailComponent } from './entry/detail/detail.component';
+import { ReportsComponent } from './entry/reports/reports.component';
 
 export const AppRoutes: Routes = [
     {
@@ -50,6 +51,10 @@ export const AppRoutes: Routes = [
                     {
                         path: 'judges',
                         component: JudgesComponent
+                    },
+                    {
+                        path: 'reports',
+                        component: ReportsComponent
                     }
                 ]
             }

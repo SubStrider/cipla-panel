@@ -40,7 +40,7 @@
           <div class="col-md-6">
             <div>
               <mat-form-field>
-                <mat-select placeholder="Ease of Implementation" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('implementability', implementability)"
+                <mat-select placeholder="Ability to Scale" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('implementability', implementability)"
                   [disabled]="implementability && !authService.canChangeScore(user)">
                   <mat-option *ngFor="let val of implementabilityConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                 </mat-select>
@@ -60,16 +60,16 @@
         <div class="row">
           <div class="col-md-12">
             <div class="text-primary">
+                <p class="help-text small" *ngIf="!uniqueness">
+                    <strong>Guidelines</strong>
+                    Synergy with Cipla: Ideas in the following categories are in synergy with Cipla: Patient centricity, AI, POC Diagnostics,
+                    Remote monitoring diagnostic devices, therapy specific medical devices, telehealth, pharmacy/doctor discovery,
+                    integrated platforms, Drugopedia, Digital healthcare platforms.Implementability: For revenue/POC stage startup,
+                    rate on team strength. Additional criteria could be funding raised, sector expertise, premium educational
+                    background. For ideation start-ups, rate on ease of implementation
+                  </p>
               <h6>Comments</h6>
               <textarea class="form-control" placeholder="Please enter some comments about this entry" rows="3" formControlName="comments" [disabled]="judgeEntryForm.get('comments').value && !authService.canChangeScore(user)"></textarea>
-              <p class="help-text small" *ngIf="!uniqueness">
-                <strong>Guidelines</strong>
-                Synergy with Cipla: Ideas in the following categories are in synergy with Cipla: Patient centricity, AI, POC Diagnostics,
-                Remote monitoring diagnostic devices, therapy specific medical devices, telehealth, pharmacy/doctor discovery,
-                integrated platforms, Drugopedia, Digital healthcare platforms.Implementability: For revenue/POC stage startup,
-                rate on team strength. Additional criteria could be funding raised, sector expertise, premium educational
-                background. For ideation start-ups, rate on ease of implementation
-              </p>
             </div>
           </div>
         </div>

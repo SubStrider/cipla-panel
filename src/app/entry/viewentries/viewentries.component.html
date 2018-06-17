@@ -2,8 +2,6 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12 mb-2">
-                <button class="btn btn-default pull-right" (click)="downloadSubmissionsCsv()">Download CSV</button>
-
                 <div fxLayoutAlign="center center">
                     <mat-form-field fxFlex="100%">
                         <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Start Searching by any term">
@@ -41,7 +39,7 @@
                                         <mat-option *ngFor="let judge of judges" [value]="judge">{{judge.name | titlecase}}</mat-option>
                                     </mat-select>
                                 </mat-form-field>
-                                <button class="btn btn-success btn-xs" (click)="assignJudges()">Assign</button>
+                                <button class="btn btn-success btn-xs" (click)="assignJudges()" [disabled]="loading">{{loading ? 'Please wait..' : 'Assign'}}</button>
                             </div>
 
                             <!-- <div class="col-xs-6 col-md-3">
@@ -146,7 +144,7 @@
                             <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
                         </mat-table>
 
-                        <mat-paginator #paginator [pageSize]="100" [pageSizeOptions]="[50, 100, 200]" (page)="scrollTop()">
+                        <mat-paginator #paginator [pageSize]="100" [pageSizeOptions]="[100, 250]" (page)="scrollTop()" showFirstLastButtons>
                         </mat-paginator>
                     </div>
                 </div>

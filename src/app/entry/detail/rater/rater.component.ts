@@ -43,14 +43,14 @@ export class RaterComponent implements OnInit {
   ];
 
   readonly implementabilityConst: Criteria[] = [
-    { criteriaName: 'Idea is realistic', criteriaScore: 100, criteriaCategory: 'implementability' },
-    { criteriaName: 'Idea seems less likely', criteriaScore: 50, criteriaCategory: 'implementability' },
-    { criteriaName: 'Challenging to execute', criteriaScore: 0, criteriaCategory: 'implementability' },
+    { criteriaName: 'High', criteriaScore: 100, criteriaCategory: 'implementability' },
+    { criteriaName: 'Medium', criteriaScore: 50, criteriaCategory: 'implementability' },
+    { criteriaName: 'Low', criteriaScore: 0, criteriaCategory: 'implementability' },
   ];
 
   readonly uniquenessConst: Criteria[] = [
-    { criteriaName: 'Idea is unique', criteriaScore: 100, criteriaCategory: 'uniqueness' },
-    { criteriaName: 'Idea is unique for India', criteriaScore: 75, criteriaCategory: 'uniqueness' },
+    { criteriaName: 'Idea is unique globally', criteriaScore: 100, criteriaCategory: 'uniqueness' },
+    { criteriaName: 'Idea is unique for geography', criteriaScore: 75, criteriaCategory: 'uniqueness' },
     { criteriaName: 'Idea is not unique, business model is unique', criteriaScore: 50, criteriaCategory: 'uniqueness' },
     { criteriaName: 'Idea is not unique', criteriaScore: 0, criteriaCategory: 'uniqueness' },
   ];

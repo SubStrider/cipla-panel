@@ -31,7 +31,7 @@ export class DataService {
 
     fetchEntries(category?: string, stage?: string, status?: string, role: string = 'judge', id?: string, style?: string) {
 
-        this.afs.collection('submissions', ref => {
+        let subscription = this.afs.collection('submissions', ref => {
             let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
             if (category) { query = query.where('category', '==', category) }
             if (stage) { query = query.where('stage', '==', stage) }
@@ -96,13 +96,14 @@ export class DataService {
                 });
             })
             .subscribe((fetchedEntries: EntryTableData[]) => {
+                subscription.unsubscribe()
                 this.entriesChanged.next(fetchedEntries);
             });
     }
 
 
     getUsers(isJudge?: boolean, isSuperJudge?: boolean) {
-        this.afs.collection('users', ref => {
+        let subscription = this.afs.collection('users', ref => {
             let query: firebase.firestore.CollectionReference | firebase.firestore.Query = ref;
             if (isJudge) { query = query.where('roles.judge', '==', true) }
             if (isSuperJudge) { query = query.where('roles.superjudge', '==', true) }
@@ -122,6 +123,7 @@ export class DataService {
                 })
             })
             .subscribe((fetchedEntries: UserTableData[]) => {
+                subscription.unsubscribe()
                 this.usersChanged.next(fetchedEntries)
             })
     }
