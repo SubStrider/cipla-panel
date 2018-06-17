@@ -53,8 +53,8 @@ export class JudgesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        // this.dataSource.sort = this.sort;
-        // this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+        this.dataSource.paginator = this.paginator;
     }
 
     updateUser(user) {
