@@ -95,11 +95,11 @@ export class RaterComponent implements OnInit {
 
         this.score = this.rating.score
 
-        if(this.user.roles.superjudge || this.user.roles.admin){
-          this.judgeEntryForm.enable()
-        } else {
-          this.judgeEntryForm.controls['comments'].disable()
-        }
+        // if(this.user.roles.superjudge || this.user.roles.admin){
+        //   this.judgeEntryForm.enable()
+        // } else {
+        //   this.judgeEntryForm.controls['comments'].disable()
+        // }
       }
     }
   }

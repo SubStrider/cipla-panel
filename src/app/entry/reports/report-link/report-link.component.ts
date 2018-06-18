@@ -10,12 +10,14 @@ import { Observable } from 'rxjs/Observable';
 export class ReportLinkComponent implements OnInit {
 
   @Input() report: any;
+  @Input('type') type: string;
   downloadUrl: Observable<string>;
 
   constructor() { }
 
   ngOnInit() {
-    const reportRef = firebase.storage().ref(`reports/${this.report.id}.csv`);
+    let extension = this.type === 'reports' ? 'submission' : 'users'
+    const reportRef = firebase.storage().ref(`${this.type}/${extension}_${this.report.id}.csv`);
     const promise = reportRef.getDownloadURL()
 
     this.downloadUrl = Observable.fromPromise(promise)

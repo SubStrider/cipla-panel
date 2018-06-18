@@ -3,10 +3,20 @@
     <button (click)="requestReport()" class="btn btn-default pull-right">
       Generate Submissions Report
     </button>
-    <h2>Reports</h2>
+    <button (click)="requestUserReport()" class="btn btn-default pull-right">
+      Generate Users Report
+    </button>
+    <h4>Submission Reports</h4>
     <hr>
       <div *ngFor="let report of reports | async">
-        <report-link [report]="report"></report-link>
+        <report-link [report]="report" [type]="'reports'"></report-link>
+      </div>
+      <br>
+      <br>
+      <h4>User Reports</h4>
+    <hr>
+      <div *ngFor="let report of userReports | async">
+        <report-link [report]="report" [type]="'users'"></report-link>
       </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 <a class="btn btn-primary is-info" role="button"
   [class.is-loading]="report.status === 'processing'"
   [href]="downloadUrl | async" download>
-  Download Report {{ report.id }}
+  Download {{ report.name }}
 </a>
 <br>

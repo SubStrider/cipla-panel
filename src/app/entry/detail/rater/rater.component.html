@@ -5,7 +5,6 @@
   <ng-container *ngIf="(authService.canJudge(user)  && (user.name === rating.judgeName) || authService.canChangeScore(user)); then form else hidden"></ng-container>
 </ng-container>
 <ng-template #form>
-  <!-- {{rating | json}} -->
   <form [formGroup]="judgeEntryForm" (ngSubmit)="saveJudgeEntry()" class="rating-form">
     <div class="card">
       <div class="card-header">
@@ -22,7 +21,7 @@
             <div>
               <mat-form-field>
                 <mat-select placeholder="3rd yr revenue potential" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('revenuePotential', revenuePotential)"
-                  [disabled]="revenuePotential && !authService.canChangeScore(user)">
+                  [disabled]="authService.canChangeScore(user)">
                   <mat-option *ngFor="let val of revenuePotentialConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                 </mat-select>
               </mat-form-field>
@@ -31,7 +30,7 @@
             <div>
               <mat-form-field>
                 <mat-select placeholder="Synergy with Cipla" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('synergy', synergy)"
-                  [disabled]="synergy && !authService.canChangeScore(user)">
+                  [disabled]="authService.canChangeScore(user)">
                   <mat-option *ngFor="let val of ciplaSynergyConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                 </mat-select>
               </mat-form-field>
@@ -41,7 +40,7 @@
             <div>
               <mat-form-field>
                 <mat-select placeholder="Ability to Scale" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('implementability', implementability)"
-                  [disabled]="implementability && !authService.canChangeScore(user)">
+                  [disabled]="authService.canChangeScore(user)">
                   <mat-option *ngFor="let val of implementabilityConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                 </mat-select>
               </mat-form-field>
@@ -50,7 +49,7 @@
             <div>
               <mat-form-field>
                 <mat-select placeholder="Idea Uniqueness" (change)="selectOption($event)" [required]="true" [value]="findAndRetrieve('uniqueness', uniqueness)"
-                  [disabled]="uniqueness && !authService.canChangeScore(user)">
+                  [disabled]="authService.canChangeScore(user)">
                   <mat-option *ngFor="let val of uniquenessConst" [value]="val">{{val.criteriaName | titlecase}}</mat-option>
                 </mat-select>
               </mat-form-field>
@@ -69,14 +68,14 @@
                     background. For ideation start-ups, rate on ease of implementation
                   </p>
               <h6>Comments</h6>
-              <textarea class="form-control" placeholder="Please enter some comments about this entry" rows="3" formControlName="comments" [disabled]="judgeEntryForm.get('comments').value && !authService.canChangeScore(user)"></textarea>
+              <textarea class="form-control" placeholder="Please enter some comments about this entry" rows="3" formControlName="comments" [disabled]="authService.canChangeScore(user)"></textarea>
             </div>
           </div>
         </div>
         <div class="row">
-          <div class="col-md-12" *ngIf="!rating.score || authService.canChangeScore(user)">
+          <div class="col-md-12" *ngIf="authService.canJudge(user) || authService.canChangeScore(user)">
             <br>
-            <button type="submit" class="btn btn-primary btn-fill btn-wd" [disabled]="!judgeEntryForm.valid || loading" *ngIf="!rating.score && authService.canJudge(user)">{{loading ? 'Saving...' : 'Save Score'}}</button>
+            <button type="submit" class="btn btn-primary btn-fill btn-wd" [disabled]="!judgeEntryForm.valid || loading" *ngIf="authService.canJudge(user)">{{loading ? 'Saving...' : 'Save Score'}}</button>
           </div>
         </div>
       </div>
