@@ -18,7 +18,7 @@
                             </div>
                         </div>
                     </div>
-    
+
                     <div class="card">
                         <div class="card-content">
                             <div class="row">
@@ -38,50 +38,56 @@
                     </div>
                 </div>
                 <div class="card">
-                <div class="card-content">
-                    <div class="row">
-                        <div class="col-xs-5">
-                            <div class="icon-big icon-warning text-center">
-                                <i class="ti-bar-chart"></i>
-                            </div>
-                        </div>
-                        <div class="col-xs-7">
-                            <div class="numbers">
-                                <p>R1 Entries</p>
-                                {{totCount}}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
                     <div class="card-content">
                         <div class="row">
                             <div class="col-xs-5">
                                 <div class="icon-big icon-warning text-center">
-                                    <i class="ti-info"></i>
+                                    <i class="ti-bar-chart"></i>
                                 </div>
                             </div>
                             <div class="col-xs-7">
                                 <div class="numbers">
-                                    <p>By Cipla</p>
-                                    {{totCiplaR1}}
+                                    <p>R1 Entries</p>
+                                    {{totCount}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="row">
+                                <div class="col-xs-5">
+                                    <div class="icon-big icon-warning text-center">
+                                        <i class="ti-info"></i>
+                                    </div>
+                                </div>
+                                <div class="col-xs-7">
+                                    <div class="numbers">
+                                        <p>By Cipla</p>
+                                        {{totCiplaR1}}
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            </div>
 
             <div class="col-lg-3 col-sm-6">
-                <div class="card card-circle-chart" data-background-color="green">
+                <div class="card card-circle-chart" data-background-color="white">
                     <div class="card-header text-center">
                         <h5 class="card-title">R1 Entries</h5>
-                        <p class="description">Judged</p>
                     </div>
                     <div class="card-content">
-                        <div id="chartOrders" class="chart-circle" [attr.data-percent]="judged | percent">{{judged | percent}}</div>
+                        <!-- <div id="chartOrders" class="chart-circle" [attr.data-percent]="judged | percent">{{judged | percent}}</div> -->
+                        <div id="chartPreferences" class="ct-chart"></div>
+                    </div>
+                    <div class="card-footer">
+                        <i class="fa fa-circle text-info"></i> Approved
+                        <i class="fa fa-circle text-danger"></i> Rejected
+                        <i class="fa fa-circle text-warning"></i> Scored
+                        <i class="fa fa-circle text-success"></i> Completed
                     </div>
                 </div>
             </div>
