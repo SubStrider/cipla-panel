@@ -38,7 +38,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     userSubscription: ISubscription;
     categories: string[] = ['pharmaceutical', 'medical', 'devices', 'hospital', 'services', 'digital', 'diagnostics'];
     stages: string[] = ['ideation', 'poc', 'revenues'];
-    statuses: string[] = ['submitted', 'approved', 'rejected', 'scored', 'completed','promoted'];
+    statuses: string[] = ['submitted', 'approved', 'rejected', 'scored', 'completed','promoted', 'finalized'];
     judges: any[] = [];
     user: User;
     loading: boolean;
