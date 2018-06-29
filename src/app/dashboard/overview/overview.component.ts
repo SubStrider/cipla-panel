@@ -19,7 +19,10 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     totCiplaR1 = 0;
     totCountR2 = 0;
     totCiplaR2 = 0;
-    judged: number = 0;
+
+    judged:any = {};
+
+    // judged: number = 0;
     userSubscription: ISubscription;
     statsSubscription: ISubscription;
     emailSubscriptions: ISubscription[] = [];
@@ -49,6 +52,7 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
     chartStage;
     chartCategory;
     chartWeek;
+    chartJudged;
 
     constructor(
         private dataService: DataService, private afs: AngularFirestore,
@@ -186,6 +190,11 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
         ];
 
         this.chartCategory = new Chartist.Bar('#chartViews', dataViews, optionsViews, responsiveOptionsViews);
+
+        this.chartJudged = new Chartist.Pie('#chartPreferences', {
+            labels: ['62%','32%','6%'],
+            series: [62, 32, 6]
+          });
     }
 
     ngAfterViewInit() {
@@ -264,15 +273,23 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.statsSubscription.unsubscribe()
                 this.reset()
                 let weekCount = []
-                let judged = 0;
+                let approved = 0;
+                let rejected = 0;
+                let scored = 0;
+                let completed = 0;
+                let unscreened = 0;
 
                 result.forEach(value => {
                     this.totCount++;
                     this.checkArrayAndUpdate(this.catCount, value.category)
                     this.checkArrayAndUpdate(this.stageCount, value.stage || 'ideation')
 
-                    if(value.status ==='completed'){
-                        judged++
+                    switch(value.status){
+                        case 'approved': approved++; break;
+                        case 'rejected': rejected++; break;
+                        case 'completed': completed++; break;
+                        case 'scored': scored++; break;
+                        default: unscreened++;
                     }
 
                     weekCount.push({
@@ -314,7 +331,17 @@ export class OverviewComponent implements OnInit, AfterViewInit, OnDestroy {
                     series: [_.map(_.values(weekData), 'length')]
                 });
 
-                this.judged = judged / this.totCount
+                this.judged['approved'] = approved / this.totCount
+                this.judged['scored'] = scored / this.totCount
+                this.judged['rejected'] =  rejected / this.totCount
+                this.judged['completed'] = completed / this.totCount
+                this.judged['unscreened'] = unscreened / this.totCount
+
+                this.chartJudged.update({
+                    labels: _.chain(this.judged).values().map(v => `${Math.round(v * 100)} %`).value(),
+                    series: _.chain(this.judged).values().map(v => v * 100).value()
+                })
+                
             });
     }
 
