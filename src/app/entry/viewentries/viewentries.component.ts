@@ -38,7 +38,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     userSubscription: ISubscription;
     categories: string[] = ['pharmaceutical', 'medical', 'devices', 'hospital', 'services', 'digital', 'diagnostics'];
     stages: string[] = ['ideation', 'poc', 'revenues'];
-    statuses: string[] = ['submitted', 'approved', 'rejected', 'scored', 'completed'];
+    statuses: string[] = ['submitted', 'approved', 'rejected', 'scored', 'completed','promoted'];
     judges: any[] = [];
     user: User;
     loading: boolean;
@@ -145,7 +145,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     assignJudges() {
         this.loading = true
         if (this.selectedJudges && (this.selectedJudges.length === 2)) {
-            if(this.selection.selected.length){
+            if (this.selection.selected.length) {
                 this.selection.selected.forEach((submission, index) => {
                     submission['loading'] = true
                     let judgeEntries = _.map(this.selectedJudges, judge => {
@@ -154,9 +154,9 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
                             judgeName: judge['name']
                         }
                     })
-    
+
                     let judges = _.fromPairs(_.zip(_.map(judgeEntries, 'judgeUID'), [true, true]))
-    
+
                     // Only allow changes to submissions if scoring is not initiated
                     if (submission['status'] === 'approved') {
                         this.dataService.updateSubmission(submission.submissionId, {
@@ -173,7 +173,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
                         submission['loading'] = false
                         window.alert('Cannot change judges if idea is beyond approved stage')
                     }
-    
+
                     if (this.selection.selected.length === (index + 1)) {
                         this.loading = false
                         window.alert(`${this.selection.selected.length} submissions have been assigned`)
@@ -191,6 +191,72 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
 
     selectJudges(event) {
         this.selectedJudges = event.value
+    }
+
+    updateStatus(status: string) {
+        switch (status) {
+            case 'promoted':
+                if (this.selection.selected.length) {
+                    this.selection.selected.forEach((submission, index) => {
+                        submission['loading'] = true
+
+                        if (submission['status'] === 'completed') {
+                            this.dataService.updateSubmission(submission.submissionId, {
+                                status: status
+                            }).then(res => {
+                                submission['loading'] = false
+                                submission['status'] = 'promoted'
+                            }).catch(err => {
+                                console.error(err);
+                                submission['loading'] = true
+                            })
+                        } else {
+                            submission['loading'] = false
+                            window.alert('Can only upgrade to promoted if status is complete')
+                        }
+
+                        if (this.selection.selected.length === (index + 1)) {
+                            this.loading = false
+                            window.alert(`${this.selection.selected.length} submissions have been changed to status ${status}`)
+                        }
+                    })
+                } else {
+                    this.loading = false;
+                    window.alert('Please select some ideas to assign judges');
+                }
+                break;
+            case 'completed':
+                if (this.selection.selected.length) {
+                    this.selection.selected.forEach((submission, index) => {
+                        submission['loading'] = true
+
+                        if (submission['status'] === 'promoted') {
+                            this.dataService.updateSubmission(submission.submissionId, {
+                                status: status
+                            }).then(res => {
+                                submission['loading'] = false
+                                submission['status'] = 'completed'
+                            }).catch(err => {
+                                console.error(err);
+                                submission['loading'] = true
+                            })
+                        } else {
+                            submission['loading'] = false
+                            window.alert('Can only downgrade to completed if status is promoted')
+                        }
+
+                        if (this.selection.selected.length === (index + 1)) {
+                            this.loading = false
+                            window.alert(`${this.selection.selected.length} submissions have been changed to status ${status}`)
+                        }
+                    })
+                } else {
+                    this.loading = false;
+                    window.alert('Please select some ideas to assign judges');
+                }
+                break;
+        }
+
     }
 
     removeJudges(submission) {
