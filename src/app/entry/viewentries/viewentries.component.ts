@@ -38,7 +38,7 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
     userSubscription: ISubscription;
     categories: string[] = ['pharmaceutical', 'medical', 'devices', 'hospital', 'services', 'digital', 'diagnostics'];
     stages: string[] = ['ideation', 'poc', 'revenues'];
-    statuses: string[] = ['submitted', 'approved', 'rejected', 'scored', 'completed','promoted', 'finalized'];
+    statuses: string[] = ['submitted', 'approved', 'rejected', 'scored', 'completed', 'promoted', 'finalized'];
     judges: any[] = [];
     user: User;
     loading: boolean;
@@ -243,6 +243,36 @@ export class ViewentriesComponent implements OnInit, OnDestroy, AfterViewInit {
                         } else {
                             submission['loading'] = false
                             window.alert('Can only downgrade to completed if status is promoted')
+                        }
+
+                        if (this.selection.selected.length === (index + 1)) {
+                            this.loading = false
+                            window.alert(`${this.selection.selected.length} submissions have been changed to status ${status}`)
+                        }
+                    })
+                } else {
+                    this.loading = false;
+                    window.alert('Please select some ideas to assign judges');
+                }
+                break;
+            case 'rejected':
+                if (this.selection.selected.length) {
+                    this.selection.selected.forEach((submission, index) => {
+                        submission['loading'] = true
+
+                        if (submission['status'] === 'completed' || submission['status'] === 'approved' || submission['status'] === 'scored') {
+                            this.dataService.updateSubmission(submission.submissionId, {
+                                status: status
+                            }).then(res => {
+                                submission['loading'] = false
+                                submission['status'] = 'rejected'
+                            }).catch(err => {
+                                console.error(err);
+                                submission['loading'] = true
+                            })
+                        } else {
+                            submission['loading'] = false
+                            window.alert('Can only reject if status is completed, approved or scored')
                         }
 
                         if (this.selection.selected.length === (index + 1)) {

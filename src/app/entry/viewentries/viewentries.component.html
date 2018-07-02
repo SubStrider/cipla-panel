@@ -44,6 +44,7 @@
                             <div class="col-xs-6 col-md-3" *ngIf="authService.canChangePermissions(user)">
                                 <button class="btn btn-primary" (click)="updateStatus('promoted')" [disabled]="loading">{{loading ? 'Please wait..' : 'Promote'}}</button>
                                 <button class="btn btn-danger" (click)="updateStatus('completed')" [disabled]="loading">{{loading ? 'Please wait..' : 'Revert'}}</button>
+                                <button class="btn btn-danger" (click)="updateStatus('rejected')" [disabled]="loading">{{loading ? 'Please wait..' : 'Reject'}}</button>
                             </div>
                             <!-- <div class="col-xs-6 col-md-3">
                                 <label>Minimum Score</label>
