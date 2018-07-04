@@ -196,7 +196,7 @@
                                 <hr>
                                 <h2>Round 2 Details</h2>
                             </div>
-                            <div class="col-md-12">
+                            <!-- <div class="col-md-12">
                                 <div class="text-primary">
                                     <h6>Entry Barriers</h6>
                                 </div>
@@ -254,6 +254,16 @@
                                     <p>
                                         {{ submission.round2.participation }}
                                     </p>
+                                </div>
+                            </div> -->
+                            <div class="col-md-12">
+                                <div class="text-primary">
+                                    <h6>Documents</h6>
+                                </div>
+                                <div>
+                                    <a *ngFor="let attachment of submission.round2.attachments; let i = index" [href]="attachment" target="_blank">
+                                        Download Document {{i + 1}}
+                                    </a>
                                 </div>
                             </div>
                         </div>
